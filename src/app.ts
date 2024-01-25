@@ -1,6 +1,9 @@
 import express, { Request, Response, request } from "express";
 const app = express();
 
+// routes
+import productRoutes from "./routes/product";
+
 //Dot env'
 import path from "path";
 import dotenv from "dotenv";
@@ -30,6 +33,8 @@ app.get("/test", async (req: Request, res: Response) => {
 
   return res.json(result.rows);
 });
+
+app.use("/product", productRoutes);
 
 // connect
 const PORT = 5000;
