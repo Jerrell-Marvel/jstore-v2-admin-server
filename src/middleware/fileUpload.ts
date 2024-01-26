@@ -28,7 +28,7 @@ export const fileUpload = (destination: string) => {
     cb(new Error("Invalid file type"));
   };
   const limits = {
-    fileSize: 1024 * 1024 * 3,
+    fileSize: 1024 * 1024 * 50,
   };
   const upload = multer({ storage, fileFilter: imageFileFilter, limits });
 

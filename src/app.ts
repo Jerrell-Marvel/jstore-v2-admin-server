@@ -1,13 +1,12 @@
 import express, { Request, Response, request } from "express";
 const app = express();
 
-// routes
-import productRoutes from "./routes/product";
-
 //Dot env'
 import path from "path";
 import dotenv from "dotenv";
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
+console.log(path.resolve(__dirname, "../.env"));
 
 //JWT
 import jwt from "jsonwebtoken";
@@ -24,6 +23,7 @@ app.use(
 //Express async errors
 import "express-async-errors";
 import { pool } from "./db";
+import { errorHandler } from "./middleware/errorHandler";
 
 //parse json
 app.use(express.json());
@@ -34,7 +34,12 @@ app.get("/test", async (req: Request, res: Response) => {
   return res.json(result.rows);
 });
 
+// routes
+import productRoutes from "./routes/product";
+
 app.use("/product", productRoutes);
+
+// app.use(errorHandler);
 
 // connect
 const PORT = 5000;
