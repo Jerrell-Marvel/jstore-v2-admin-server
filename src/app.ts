@@ -29,9 +29,21 @@ import { errorHandler } from "./middleware/errorHandler";
 app.use(express.json());
 
 app.get("/test", async (req: Request, res: Response) => {
-  const result = await pool.query("SELECT * FROM products");
+  return res.json("jdlksf");
+  // const result = await pool.query("SELECT * FROM products");
+  // return res.json(result.rows);
+});
 
-  return res.json(result.rows);
+app.post("/example", (req, res) => {
+  console.log("awewo");
+  // Access query parameters using req.query
+  // const searchTerm = req.query.searchTerm;
+
+  console.log(req.query);
+
+  return res.json(req.query);
+  // Process the request further
+  // res.send("Received search term: " + searchTerm);
 });
 
 // routes

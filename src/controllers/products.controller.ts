@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { BadRequestError } from "../errors/BadRequestError";
 import { addProduct } from "../services/products.service";
 import { StatusCodes } from "http-status-codes";
+import { addProductImages } from "../services/productImages.service";
+import { ProductVariantWithImage } from "../types/productVariants";
+import { parseProductVariantArray } from "../utils/typeChecks";
 
 export const createProduct = async (req: Request, res: Response) => {
   const { name, description, quantity, price } = req.body;
@@ -29,5 +32,37 @@ export const createProduct = async (req: Request, res: Response) => {
 };
 
 export const createProductWithVariants = (req: Request, res: Response) => {
-  return res.json("yeya");
+  const { name, description, variants, defaultVariantIdx } = req.body;
+
+  if (!name || !description || !defaultVariantIdx) {
+    console.log(name, description, defaultVariantIdx);
+    throw new BadRequestError("missing fields");
+  }
+
+  if (!Array.isArray(variants) || variants.length == 0) {
+    throw new BadRequestError("variants must be an array and not empty");
+  }
+
+  const parsedVariants = parseProductVariantArray(variants);
+
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+  let displayImage: Express.Multer.File[] | undefined;
+
+  if (!files.displayImage) {
+    throw new BadRequestError("display image can't be empty");
+  } else {
+    displayImage = files.displayImage;
+  }
+
+  const variantWithImages: ProductVariantWithImage[] = parsedVariants.map((variant, idx) => {
+    return {
+      ...variant,
+      images: files[`variants[${idx}][images]`],
+    };
+  });
+
+  console.log(variantWithImages);
+
+  return res.json(variantWithImages);
 };

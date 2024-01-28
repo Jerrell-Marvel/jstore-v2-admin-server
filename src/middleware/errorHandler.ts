@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { Request, Response, NextFunction } from "express";
+
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(JSON.stringify(err));
   console.log("here");
