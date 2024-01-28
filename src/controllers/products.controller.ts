@@ -34,13 +34,11 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const createProductWithVariants = async (req: Request, res: Response) => {
   const { name, description, variants, defaultVariantIdx } = req.body;
-
   if (!name || !description || !defaultVariantIdx) {
     console.log(name, description, defaultVariantIdx);
     throw new BadRequestError("missing fields");
   }
-
-  if (!Array.isArray(variants) || variants.length == 0) {
+  if (!Array.isArray(variants) || variants.length === 0) {
     throw new BadRequestError("variants must be an array and not empty");
   }
 
@@ -56,42 +54,20 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
     displayImage = files.displayImage;
   }
 
-  let imagesToMove: Express.Multer.File[] = [displayImage[0]];
-  let imagesToDelete: Express.Multer.File[] = [];
+  let imagesToSave: Express.Multer.File[] = [];
 
-  const variantWithImages: ProductVariantWithImage[] = parsedVariants.map((variant) => {
+  const variantWithImages: ProductVariantWithImage[] = parsedVariants.map((variant, idx) => {
+    const images = files[`variants[${idx}][images]`] || [];
+
+    if (images && images.length !== 0) {
+      imagesToSave = [...imagesToSave, ...images];
+    }
+
     return {
       ...variant,
-      images: [],
+      images,
     };
   });
-
-  for (const [key, file] of Object.entries(files)) {
-    const match = key.match(/\[(\d+)\]\[images\]/);
-
-    if (match) {
-      const variantIdx = parseInt(match[1]);
-
-      if (variantIdx >= variantWithImages.length) {
-        imagesToDelete.push(file);
-      }
-
-      variantWithImages[variantIdx].images = file;
-    }
-  }
-
-  // const variantWithImages: ProductVariantWithImage[] = parsedVariants.map((variant, idx) => {
-  //   const images = files[`variants[${idx}][images]`];
-  //   imagesToMove = [...imagesToMove, ...images];
-  //   return {
-  //     ...variant,
-  //     images: files[`variants[${idx}][images]`],
-  //   };
-  // });
-  console.log(imagesToMove);
-
-  await moveFiles(imagesToMove);
-  return res.json(variantWithImages);
 
   return res.json(variantWithImages);
 };

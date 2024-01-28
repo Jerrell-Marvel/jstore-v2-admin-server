@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { BadRequestError } from "../errors/BadRequestError";
 import multer, { Field } from "multer";
-import { fileUpload } from "./fileUpload";
+import { memoryFileUpload } from "./memoryFileUpload";
 
 export const productWithVariantsFileUpload = async (req: Request, res: Response, next: NextFunction) => {
   const MAX_VARIANT_LIMIT = 10;
@@ -20,5 +20,5 @@ export const productWithVariantsFileUpload = async (req: Request, res: Response,
     });
   }
 
-  fileUpload("./public/temp-product-images").fields(fileFields)(req, res, next);
+  memoryFileUpload().fields(fileFields)(req, res, next);
 };
