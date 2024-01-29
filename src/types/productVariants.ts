@@ -1,3 +1,9 @@
+export type Product<T extends string | number> = {
+  name: string;
+  quantity: T;
+  price: T;
+};
+
 export type ProductVariant = {
   name: string;
   quantity: number;

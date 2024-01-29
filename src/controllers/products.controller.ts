@@ -8,6 +8,7 @@ import { parseProductVariantArray } from "../utils/typeChecks";
 import { moveFiles } from "../utils/fileUtils";
 
 export const createProduct = async (req: Request, res: Response) => {
+  return res.json(req.body);
   const { name, description, quantity, price } = req.body;
 
   const parsedQuantity = parseInt(quantity);
@@ -17,7 +18,13 @@ export const createProduct = async (req: Request, res: Response) => {
     throw new BadRequestError("missing fields");
   }
 
-  if (isNaN(parsedQuantity) || isNaN(parsedPrice) || parsedQuantity < 0 || parsedQuantity < 0) {
+  if (typeof name !== "string") {
+    return;
+  }
+
+  console.log(name);
+
+  if (isNaN(parsedQuantity) || isNaN(parseInt(quantity)) || parsedQuantity < 0 || parsedQuantity < 0) {
     throw new BadRequestError("invalid quantity or price field");
   }
 
@@ -68,6 +75,11 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
       images,
     };
   });
+
+  // await addProduct
+  // await addProductImage
+  // await productVariant
+  // await productVariantImage
 
   return res.json(variantWithImages);
 };

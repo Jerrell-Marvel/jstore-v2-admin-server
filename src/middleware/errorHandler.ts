@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { Request, Response, NextFunction } from "express";
+import { MulterError } from "multer";
 
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(JSON.stringify(err));

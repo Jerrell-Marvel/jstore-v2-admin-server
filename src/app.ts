@@ -21,14 +21,15 @@ app.use(
 );
 
 //Express async errors
-import "express-async-errors";
+// import "express-async-errors";
 import { pool } from "./db";
 import { errorHandler } from "./middleware/errorHandler";
 
 //parse json
 app.use(express.json());
 
-app.get("/test", async (req: Request, res: Response) => {
+app.get("/test", (req: Request, res: Response) => {
+  throw new Error("aweow");
   return res.json("jdlksf");
   // const result = await pool.query("SELECT * FROM products");
   // return res.json(result.rows);
@@ -51,7 +52,7 @@ import productRoutes from "./routes/product";
 
 app.use("/product", productRoutes);
 
-// app.use(errorHandler);
+app.use(errorHandler);
 
 // connect
 const PORT = 5000;
