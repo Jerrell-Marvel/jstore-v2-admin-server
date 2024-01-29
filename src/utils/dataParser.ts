@@ -1,5 +1,5 @@
 import { BadRequestError } from "../errors/BadRequestError";
-import { ProductVariant } from "../types/productVariants";
+import { ProductVariant } from "../types/product";
 
 export const parseProductVariantArray = (items: any[]): ProductVariant[] => {
   const result = items.map((item: any) => {

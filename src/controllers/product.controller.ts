@@ -3,40 +3,32 @@ import { BadRequestError } from "../errors/BadRequestError";
 import { addProduct } from "../services/products.service";
 import { StatusCodes } from "http-status-codes";
 import { addProductImages } from "../services/productImages.service";
-import { ProductVariantWithImage } from "../types/productVariants";
+import { ProductVariantWithImage } from "../types/product";
 import { parseProductVariantArray } from "../utils/typeChecks";
 import { moveFiles } from "../utils/fileUtils";
+import { validateCreateProductReq } from "../validation/product.validation";
+import { pool } from "../db";
 
 export const createProduct = async (req: Request, res: Response) => {
-  return res.json(req.body);
-  const { name, description, quantity, price } = req.body;
+  const { body, files } = await validateCreateProductReq(req);
 
-  const parsedQuantity = parseInt(quantity);
-  const parsedPrice = parseInt(price);
+  const client = await pool.connect();
 
-  if (!name || !description || !quantity || !price) {
-    throw new BadRequestError("missing fields");
+  try {
+    await client.query("BEGIN");
+    const productId = await addProduct(body, "test", client);
+
+    await addProductImages(files.displayImage as Express.Multer.File[], productId, client);
+
+    await client.query("COMMIT");
+
+    return res.status(StatusCodes.CREATED).json(productId);
+  } catch (e) {
+    await client.query("ROLLBACK");
+    throw e;
+  } finally {
+    client.release();
   }
-
-  if (typeof name !== "string") {
-    return;
-  }
-
-  console.log(name);
-
-  if (isNaN(parsedQuantity) || isNaN(parseInt(quantity)) || parsedQuantity < 0 || parsedQuantity < 0) {
-    throw new BadRequestError("invalid quantity or price field");
-  }
-
-  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-  if (!files.displayImage) {
-    throw new BadRequestError("display image can't be empty");
-  }
-
-  const result = await addProduct({ name, description, quantity, price }, files.displayImage[0], files.productImages);
-
-  return res.status(StatusCodes.CREATED).json(result);
 };
 
 export const createProductWithVariants = async (req: Request, res: Response) => {

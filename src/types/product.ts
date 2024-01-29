@@ -1,8 +1,6 @@
-export type Product<T extends string | number> = {
-  name: string;
-  quantity: T;
-  price: T;
-};
+import { z } from "zod";
+import { ProductSchema } from "../schema/Product";
+export type Product = z.infer<typeof ProductSchema>;
 
 export type ProductVariant = {
   name: string;

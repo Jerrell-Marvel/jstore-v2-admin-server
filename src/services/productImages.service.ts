@@ -8,7 +8,6 @@ export const addProductImages = async (images: Express.Multer.File[], productId:
   const query = format(`INSERT INTO product_images (image_url, product_id) VALUES %L RETURNING product_image_id`, imageValues);
 
   let result;
-
   if (client) {
     result = await client.query(query);
   } else {

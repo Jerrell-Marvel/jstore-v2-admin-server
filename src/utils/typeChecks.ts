@@ -1,5 +1,5 @@
 import { BadRequestError } from "../errors/BadRequestError";
-import { ProductVariant } from "../types/productVariants";
+import { ProductVariant } from "../types/product";
 
 // export const isProductVariantArray = (arr: any[]): arr is ProductVariant[] => {
 //   // Check if each element in the array is of type ProductVariants
