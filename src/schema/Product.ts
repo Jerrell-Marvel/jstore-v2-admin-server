@@ -17,3 +17,11 @@ export const ProductSchema = z
     price: z.coerce.number().gt(0),
   })
   .strict();
+
+export const ProductVariantSchema = z
+  .object({
+    name: z.string().trim().min(1).max(255),
+    quantity: z.coerce.number().gt(0),
+    price: z.coerce.number().gt(0),
+  })
+  .strict();
