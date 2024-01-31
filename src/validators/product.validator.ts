@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { z, ZodError } from "zod";
 import { ProductSchema, ProductVariantSchema } from "../schema/Product";
+import { generateUniqueSuffix } from "../utils/common";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
   console.log(req.body);
@@ -15,7 +16,24 @@ export const validateAndProcessCreateProductReq = async (req: Request) => {
       .strict(),
   });
 
-  return await CreateProductReqSchema.parseAsync(req);
+  const parsedReq = await CreateProductReqSchema.parseAsync(req);
+
+  const files = parsedReq.files as {
+    displayImage: Express.Multer.File[];
+    productImages: Express.Multer.File[];
+  };
+
+  const displayImageWithPath = files.displayImage[0];
+  displayImageWithPath.path = "/public/product-images/" + generateUniqueSuffix() + "-" + displayImageWithPath.originalname;
+
+  const productImagesWithPath = files.productImages.map((image) => {
+    return {
+      ...image,
+      path: "/public/product-images/" + generateUniqueSuffix() + "-" + image.originalname,
+    };
+  });
+
+  return { body: parsedReq.body, files, displayImage: displayImageWithPath, productImages: productImagesWithPath };
 };
 
 export const validateAndProcessCreateProductWithVariantsReq = async (req: Request) => {
@@ -28,7 +46,7 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
     })
     .strict()
     .refine((data) => data.defaultVariantIdx < data.variants.length, {
-      message: "invalid defaultVariantIdx field",
+      message: "invalid defaultVariantIdx field (variant doesn't exist)",
       path: ["defaultVariantIdx"],
     });
   // files
@@ -50,17 +68,30 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
 
   const files = parsedReq.files as { displayImage: Express.Multer.File[]; [key: string]: Express.Multer.File[] };
 
-  const variantImages: Express.Multer.File[][] = [];
+  // process display images
+  const displayImage = files.displayImage[0];
+  displayImage.path = "/public/product-images/" + generateUniqueSuffix() + "-" + displayImage.originalname;
 
-  // console.log(files);
+  // process variant images
+  const variantImages: Express.Multer.File[][] = [];
 
   for (let i = 0; i < parsedReq.body.variants.length; i++) {
     const images = files[`variants[${i}][images]`] || [];
 
-    variantImages.push(images);
+    // attaching path to each variantImage
+    const imagesWithPath = images.map((image) => {
+      return {
+        ...image,
+        path: "/public/product-images/" + generateUniqueSuffix() + "-" + image.originalname,
+      };
+    });
+
+    variantImages.push(imagesWithPath);
   }
 
-  console.log(variantImages);
+  // process display price
+  const variants = parsedReq.body.variants;
+  const displayPrice = variants[parsedReq.body.defaultVariantIdx].price;
 
-  return { body: parsedReq.body, files: files, variantImages };
+  return { body: parsedReq.body, files, variantImages, displayImage, displayPrice };
 };

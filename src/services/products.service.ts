@@ -1,10 +1,11 @@
-import { PoolClient } from "pg";
+import { Pool, PoolClient } from "pg";
 import { pool } from "../db";
 import { InternalServerError } from "../errors/InternalServerError";
 import { Product, ProductVariant } from "../types/product";
 import { addProductImages } from "./productImages.service";
 
-export const addProduct = async (productData: Product, displayImageUrl: string, client?: PoolClient) => {
+export const addProduct = async (productData: Product & { displayImageUrl: string }, client?: PoolClient) => {
+  const { name, description, quantity, price, displayImageUrl } = productData;
   const query = {
     text: `
         INSERT INTO products (name, description, quantity, price, display_price, display_image_url)
@@ -12,7 +13,7 @@ export const addProduct = async (productData: Product, displayImageUrl: string, 
         ($1, $2, $3, $4, $5, $6)
         RETURNING product_id;
         `,
-    values: [productData.name, productData.description, productData.quantity, productData.price, productData.price, displayImageUrl],
+    values: [name, description, quantity, price, price, displayImageUrl],
   };
 
   let result;
@@ -66,34 +67,27 @@ export const addProduct = async (productData: Product, displayImageUrl: string, 
 //   };
 // };
 
-export const addProductWithVariants = async (
-  productData: { name: string; description: string; displayImage: Express.Multer.File[] },
-  variants: ProductVariant[],
-  defaultVariantIdx: number,
-  productImages: Express.Multer.File[],
-  variantImages: { [key: number]: Express.Multer.File[] }
-) => {
-  const client = await pool.connect();
-  let productId: number;
+export const addProductWithVariants = async (productData: { name: string; description: string; displayPrice: number; displayImageUrl: string }, client?: PoolClient) => {
+  const { name, description, displayImageUrl, displayPrice } = productData;
 
-  try {
-    client.query("BEGIN");
+  // const displayPrice = variants[defaultVariantIdx].price;
 
-    const query = {
-      text: `
+  const query = {
+    text: `
       INSERT INTO products (name, description, display_price, display_image_url)
       VALUES
       ($1, $2, $3, $4)
       RETURNING product_id;
       `,
-      values: [productData.name, productData.description, variants[defaultVariantIdx].price, productData.displayImage],
-    };
+    values: [name, description, displayPrice, displayImageUrl],
+  };
 
-    const insertProductResult = await client.query(query);
-    productId = insertProductResult.rows[0].product_id;
-  } catch (e) {
-    client.query("ROLLBACK");
-  } finally {
-    client.query("COMMIT");
+  let result;
+  if (client) {
+    result = await client.query(query);
+  } else {
+    result = await pool.query(query);
   }
+
+  return result.rows[0].product_id as number;
 };
