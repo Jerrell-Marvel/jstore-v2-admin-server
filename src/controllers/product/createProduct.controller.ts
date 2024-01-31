@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { addProduct, addProductWithVariants } from "../services/products.service";
+import { addProduct, addProductWithVariants } from "../../services/products.service";
 import { StatusCodes } from "http-status-codes";
-import { addProductImages } from "../services/productImages.service";
-import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq } from "../validators/product.validator";
-import { pool } from "../db";
+import { addProductImages } from "../../services/productImages.service";
+import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq } from "../../requestHandlers/product/createProductReqHandlers";
+import { pool } from "../../db";
 
 export const createProduct = async (req: Request, res: Response) => {
   const { body, files, displayImage, productImages } = await validateAndProcessCreateProductReq(req);

@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { z, ZodError } from "zod";
-import { ProductSchema, ProductVariantSchema } from "../schema/Product";
-import { generateUniqueSuffix } from "../utils/common";
+import { ProductSchema, ProductVariantSchema } from "../../schema/Product";
+import { generateUniqueSuffix } from "../../utils/common";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
   console.log(req.body);
