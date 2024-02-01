@@ -2,7 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { pool } from "../db";
 import { InternalServerError } from "../errors/InternalServerError";
 import { Product, ProductVariant } from "../types/product";
-import { addProductImages } from "./productImages.service";
+import { addProductImages } from "./productImage.service";
 
 export const addProduct = async (productData: Product & { displayImageUrl: string }, client?: PoolClient) => {
   const { name, description, quantity, price, displayImageUrl } = productData;

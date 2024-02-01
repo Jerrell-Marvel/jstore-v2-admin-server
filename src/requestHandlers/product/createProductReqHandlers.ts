@@ -20,20 +20,20 @@ export const validateAndProcessCreateProductReq = async (req: Request) => {
 
   const files = parsedReq.files as {
     displayImage: Express.Multer.File[];
-    productImages: Express.Multer.File[];
+    productImages?: Express.Multer.File[];
   };
 
   const displayImageWithPath = files.displayImage[0];
   displayImageWithPath.path = "/public/product-images/" + generateUniqueSuffix() + "-" + displayImageWithPath.originalname;
 
-  const productImagesWithPath = files.productImages.map((image) => {
+  const productImagesWithPath = files.productImages?.map((image) => {
     return {
       ...image,
       path: "/public/product-images/" + generateUniqueSuffix() + "-" + image.originalname,
     };
   });
 
-  return { body: parsedReq.body, files, displayImage: displayImageWithPath, productImages: productImagesWithPath };
+  return { body: parsedReq.body, files, displayImage: displayImageWithPath, productImages: productImagesWithPath || [] };
 };
 
 export const validateAndProcessCreateProductWithVariantsReq = async (req: Request) => {
@@ -52,10 +52,10 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
   // files
 
   //variant image files don't hv to be validated again because of multer, only check display image
-
   const fileSchema = z
     .object({
       displayImage: z.array(z.unknown()).nonempty().max(1),
+      productImages: z.array(z.unknown()).nonempty().max(8).optional(),
     })
     .passthrough();
 
@@ -66,13 +66,22 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
 
   const parsedReq = await CreateProductWithVariantReqSchema.parseAsync(req);
 
-  const files = parsedReq.files as { displayImage: Express.Multer.File[]; [key: string]: Express.Multer.File[] };
+  const files = parsedReq.files as { displayImage: Express.Multer.File[]; productImages?: Express.Multer.File[] } & { [key: string]: Express.Multer.File[] | undefined };
 
   // process display images
   const displayImage = files.displayImage[0];
   displayImage.path = "/public/product-images/" + generateUniqueSuffix() + "-" + displayImage.originalname;
 
+  // process product images
+  const productImagesWithPath = files.productImages?.map((image) => {
+    return {
+      ...image,
+      path: "/public/product-images/" + generateUniqueSuffix() + "-" + image.originalname,
+    };
+  });
+
   // process variant images
+  // will contain array of multer file array, same index with variants array
   const variantImages: Express.Multer.File[][] = [];
 
   for (let i = 0; i < parsedReq.body.variants.length; i++) {
@@ -93,5 +102,5 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
   const variants = parsedReq.body.variants;
   const displayPrice = variants[parsedReq.body.defaultVariantIdx].price;
 
-  return { body: parsedReq.body, files, variantImages, displayImage, displayPrice };
+  return { body: parsedReq.body, files, productImages: productImagesWithPath, variantImages, displayImage, displayPrice };
 };

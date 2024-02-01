@@ -12,6 +12,10 @@ export const productWithVariantsFileUpload = async (req: Request, res: Response,
       name: "displayImage",
       maxCount: 1,
     },
+    {
+      name: "productImages",
+      maxCount: 8,
+    },
   ];
   for (let i = 0; i < MAX_VARIANT_LIMIT; i++) {
     fileFields.push({
