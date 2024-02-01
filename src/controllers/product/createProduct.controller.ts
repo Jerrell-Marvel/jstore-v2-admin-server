@@ -16,7 +16,9 @@ export const createProduct = async (req: Request, res: Response) => {
     await client.query("BEGIN");
     const productId = await addProduct({ ...body, displayImageUrl: displayImage.path }, client);
 
-    await addProductImages(productImages, productId, client);
+    if (productImages) {
+      await addProductImages(productImages, productId, client);
+    }
 
     await client.query("COMMIT");
 
@@ -49,11 +51,11 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
       };
     });
 
-    await addVariantImages(variantIdWithImages, client);
-
     if (productImages) {
       await addProductImages(productImages, productId, client);
     }
+
+    await addVariantImages(variantIdWithImages, client);
 
     await client.query("COMMIT");
 

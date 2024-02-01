@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import { InternalServerError } from "../errors/InternalServerError";
+import { generateUniqueSuffix } from "./common";
 
 export const moveFiles = async (files: Express.Multer.File[]): Promise<string[]> => {
   const promises = [];
@@ -18,4 +19,15 @@ export const moveFiles = async (files: Express.Multer.File[]): Promise<string[]>
   } catch (e) {
     throw new InternalServerError("fail uploading files");
   }
+};
+
+export const attachPathToFiles = (files: Express.Multer.File[]) => {
+  const filesWithPath = files.map((file) => {
+    return {
+      ...file,
+      path: "/public/product-images/" + generateUniqueSuffix() + "-" + file.originalname,
+    };
+  });
+
+  return filesWithPath;
 };

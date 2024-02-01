@@ -2,6 +2,7 @@ import { Request } from "express";
 import { z, ZodError } from "zod";
 import { ProductSchema, ProductVariantSchema } from "../../schema/Product";
 import { generateUniqueSuffix } from "../../utils/common";
+import { attachPathToFiles } from "../../utils/fileUtils";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
   console.log(req.body);
@@ -23,17 +24,11 @@ export const validateAndProcessCreateProductReq = async (req: Request) => {
     productImages?: Express.Multer.File[];
   };
 
-  const displayImageWithPath = files.displayImage[0];
-  displayImageWithPath.path = "/public/product-images/" + generateUniqueSuffix() + "-" + displayImageWithPath.originalname;
+  const displayImageWithPath = attachPathToFiles(files.displayImage)[0];
 
-  const productImagesWithPath = files.productImages?.map((image) => {
-    return {
-      ...image,
-      path: "/public/product-images/" + generateUniqueSuffix() + "-" + image.originalname,
-    };
-  });
+  const productImagesWithPath = files.productImages && attachPathToFiles(files.productImages);
 
-  return { body: parsedReq.body, files, displayImage: displayImageWithPath, productImages: productImagesWithPath || [] };
+  return { body: parsedReq.body, files, displayImage: displayImageWithPath, productImages: productImagesWithPath };
 };
 
 export const validateAndProcessCreateProductWithVariantsReq = async (req: Request) => {
@@ -69,16 +64,10 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
   const files = parsedReq.files as { displayImage: Express.Multer.File[]; productImages?: Express.Multer.File[] } & { [key: string]: Express.Multer.File[] | undefined };
 
   // process display images
-  const displayImage = files.displayImage[0];
-  displayImage.path = "/public/product-images/" + generateUniqueSuffix() + "-" + displayImage.originalname;
+  const displayImageWithPath = attachPathToFiles(files.displayImage)[0];
 
   // process product images
-  const productImagesWithPath = files.productImages?.map((image) => {
-    return {
-      ...image,
-      path: "/public/product-images/" + generateUniqueSuffix() + "-" + image.originalname,
-    };
-  });
+  const productImagesWithPath = files.productImages && attachPathToFiles(files.productImages);
 
   // process variant images
   // will contain array of multer file array, same index with variants array
@@ -88,12 +77,7 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
     const images = files[`variants[${i}][images]`] || [];
 
     // attaching path to each variantImage
-    const imagesWithPath = images.map((image) => {
-      return {
-        ...image,
-        path: "/public/product-images/" + generateUniqueSuffix() + "-" + image.originalname,
-      };
-    });
+    const imagesWithPath = attachPathToFiles(images);
 
     variantImages.push(imagesWithPath);
   }
@@ -102,5 +86,5 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
   const variants = parsedReq.body.variants;
   const displayPrice = variants[parsedReq.body.defaultVariantIdx].price;
 
-  return { body: parsedReq.body, files, productImages: productImagesWithPath, variantImages, displayImage, displayPrice };
+  return { body: parsedReq.body, files, productImages: productImagesWithPath, variantImages, displayImage: displayImageWithPath, displayPrice };
 };
