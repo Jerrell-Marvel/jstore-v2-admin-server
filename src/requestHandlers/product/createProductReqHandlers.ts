@@ -71,7 +71,7 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
 
   // process variant images
   // will contain array of multer file array, same index with variants array
-  const variantImages: Express.Multer.File[][] = [];
+  const variantsImages: Express.Multer.File[][] = [];
 
   for (let i = 0; i < parsedReq.body.variants.length; i++) {
     const images = files[`variants[${i}][images]`] || [];
@@ -79,12 +79,12 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
     // attaching path to each variantImage
     const imagesWithPath = attachPathToFiles(images);
 
-    variantImages.push(imagesWithPath);
+    variantsImages.push(imagesWithPath);
   }
 
   // process display price
   const variants = parsedReq.body.variants;
   const displayPrice = variants[parsedReq.body.defaultVariantIdx].price;
 
-  return { body: parsedReq.body, files, productImages: productImagesWithPath, variantImages, displayImage: displayImageWithPath, displayPrice };
+  return { body: parsedReq.body, files, productImages: productImagesWithPath, variantsImages, displayImage: displayImageWithPath, displayPrice };
 };

@@ -6,6 +6,7 @@ import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWith
 import { pool } from "../../db";
 import { addProductVariants } from "../../services/productVariant.service";
 import { addVariantImages } from "../../services/variantImage.service";
+import { saveFiles } from "../../utils/fileUtils";
 
 export const createProduct = async (req: Request, res: Response) => {
   const { body, files, displayImage, productImages } = await validateAndProcessCreateProductReq(req);
@@ -33,7 +34,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const createProductWithVariants = async (req: Request, res: Response) => {
   // return res.json(req.files);
-  const { body, files, variantImages, displayImage, displayPrice, productImages } = await validateAndProcessCreateProductWithVariantsReq(req);
+  const { body, files, variantsImages, displayImage, displayPrice, productImages } = await validateAndProcessCreateProductWithVariantsReq(req);
 
   const client = await pool.connect();
 
@@ -44,18 +45,26 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
 
     const productVariantIds = await addProductVariants(body.variants, productId, client);
 
-    const variantIdWithImages = productVariantIds.map((id, idx) => {
-      return {
-        variantId: id,
-        variantImages: variantImages[idx],
-      };
-    });
+    const imagesToSave = [displayImage];
 
+    // to save it to product_images table
     if (productImages) {
+      imagesToSave.push(...productImages);
       await addProductImages(productImages, productId, client);
     }
 
+    const variantIdWithImages = productVariantIds.map((id, idx) => {
+      const images = variantsImages[idx];
+      imagesToSave.push(...images);
+
+      return {
+        variantId: id,
+        variantImages: images,
+      };
+    });
     await addVariantImages(variantIdWithImages, client);
+
+    await saveFiles(imagesToSave);
 
     await client.query("COMMIT");
 

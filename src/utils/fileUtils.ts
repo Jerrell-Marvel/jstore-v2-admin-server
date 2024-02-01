@@ -2,6 +2,26 @@ import fs from "fs/promises";
 import { InternalServerError } from "../errors/InternalServerError";
 import { generateUniqueSuffix } from "./common";
 
+export const saveFiles = async (files: Express.Multer.File[]) => {
+  const publicDirectoryPath = `C:/IT/Projects/jstore-v2/admin/server/dist`;
+
+  const promises = [];
+
+  try {
+    for (const file of files) {
+      const filePath = file.path;
+      const destinationPath = publicDirectoryPath + filePath;
+
+      promises.push(fs.writeFile(destinationPath, file.buffer));
+    }
+
+    await Promise.all(promises);
+  } catch (err) {
+    console.log(err);
+    throw new InternalServerError("error occured when saving files");
+  }
+};
+
 export const moveFiles = async (files: Express.Multer.File[]): Promise<string[]> => {
   const promises = [];
   const newPaths: string[] = [];
