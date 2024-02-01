@@ -11,12 +11,15 @@ export const addProductImages = async (images: Express.Multer.File[], productId:
 
   const query = format(`INSERT INTO product_images (image_url, product_id) VALUES %L RETURNING product_image_id`, imageValues);
 
-  let result;
+  let queryResult;
   if (client) {
-    result = await client.query(query);
+    queryResult = await client.query(query);
   } else {
-    result = await pool.query(query);
+    queryResult = await pool.query(query);
   }
 
-  return result.rows;
+  const rows = queryResult.rows as { product_image_id: number }[];
+
+  const result = rows.map((row) => row.product_image_id);
+  return result;
 };

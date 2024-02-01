@@ -3,13 +3,8 @@ import { pool } from "../db";
 import { PoolClient } from "pg";
 import { BadRequestError } from "../errors/BadRequestError";
 
-type AddVariantImagesParams = {
-  data: { variantId: number; variantImages: Express.Multer.File[] }[];
-  client?: PoolClient;
-};
-
 export const addVariantImages = async (data: { variantId: number; variantImages: Express.Multer.File[] }[], client?: PoolClient) => {
-  console.log(data);
+  // console.log(data);
   const imageValues: (string | number)[][] = [];
 
   let isEmpty = true;
@@ -26,12 +21,16 @@ export const addVariantImages = async (data: { variantId: number; variantImages:
 
   const query = format(`INSERT INTO variant_images (product_variant_id, image_url) VALUES %L RETURNING variant_image_id`, imageValues);
 
-  let result;
+  let queryResult;
   if (client) {
-    result = await client.query(query);
+    queryResult = await client.query(query);
   } else {
-    result = await pool.query(query);
+    queryResult = await pool.query(query);
   }
 
-  return result.rows;
+  const rows = queryResult.rows as { variant_image_id: number }[];
+
+  const result = rows.map((row) => row.variant_image_id);
+
+  return result;
 };

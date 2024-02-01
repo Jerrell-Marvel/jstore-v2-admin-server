@@ -6,21 +6,22 @@ import { pool } from "../db";
 export const addProductVariants = async (variants: ProductVariant[], productId: number, client?: PoolClient) => {
   const variantValues = variants.map((variant) => [productId, variant.name, variant.price, variant.quantity]);
 
-  console.log(variantValues);
-
   const query = format(
     `INSERT INTO product_variants (product_id, name, quantity, price)
   VALUES %L RETURNING product_variant_id`,
     variantValues
   );
 
-  let result;
+  let queryResult;
 
   if (client) {
-    result = await client.query(query);
+    queryResult = await client.query(query);
   } else {
-    result = await pool.query(query);
+    queryResult = await pool.query(query);
   }
 
-  return result.rows.map((data) => data.product_variant_id);
+  const rows = queryResult.rows as { product_variant_id: number }[];
+
+  const result = rows.map((row) => row.product_variant_id);
+  return result;
 };
