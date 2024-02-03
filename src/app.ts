@@ -29,21 +29,28 @@ import { errorHandler } from "./middleware/errorHandler";
 app.use(express.json());
 
 import { z } from "zod";
+
 app.get("/test", (req: Request, res: Response) => {
-  throw "xiixixi";
-  const schema = z.object({
-    name: z.number(),
-  });
+  updateProduct(
+    {
+      name: "eits",
+      price: 5000,
+    },
+    5
+  );
 
-  const obj = {
-    name: "asep",
-  };
-
-  try {
-    schema.parse(obj);
-  } catch (e: any) {
-    return res.json(e);
-  }
+  return res.json("yeya");
+  // const schema = z.object({
+  //   name: z.number(),
+  // });
+  // const obj = {
+  //   name: "asep",
+  // };
+  // try {
+  //   schema.parse(obj);
+  // } catch (e: any) {
+  //   return res.json(e);
+  // }
 });
 
 app.post("/example", (req, res) => {
@@ -60,6 +67,7 @@ app.post("/example", (req, res) => {
 
 // routes
 import productRoutes from "./routes/product";
+import { updateProduct } from "./services/product.service";
 
 app.use("/product", productRoutes);
 

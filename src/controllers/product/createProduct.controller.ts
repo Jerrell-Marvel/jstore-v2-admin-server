@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { addProduct, addProductWithVariants } from "../../services/product.service";
+import { addProduct, addProductWithVariants, updateProduct } from "../../services/product.service";
 import { StatusCodes } from "http-status-codes";
 import { addProductImages } from "../../services/productImage.service";
 import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq } from "../../requestHandlers/product/createProductReqHandlers";
@@ -65,6 +65,8 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
     await addVariantImages(variantIdWithImages, client);
 
     await saveFiles(imagesToSave);
+
+    await updateProduct({ default_variant: productVariantIds[body.defaultVariantIdx] }, productId, client);
 
     await client.query("COMMIT");
 
