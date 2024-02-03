@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import { fileUpload } from "../middleware/fileUpload";
-import { createProduct, createProductWithVariants } from "../controllers/product/createProduct.controller";
+import { createProduct, createProductWithVariants } from "../controllers/product/product.controller";
 import { productWithVariantsFileUpload } from "../middleware/productWithVariantsFileUpload";
 
 const router = express.Router();

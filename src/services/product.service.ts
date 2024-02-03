@@ -58,6 +58,8 @@ export const updateProduct = async (
     quantity?: number;
     price?: number;
     default_variant?: number;
+    display_image_url?: string;
+    display_image_alt?: string;
   },
   productId: number,
   client?: PoolClient

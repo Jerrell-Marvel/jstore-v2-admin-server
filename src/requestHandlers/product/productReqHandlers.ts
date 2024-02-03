@@ -1,8 +1,9 @@
 import { Request } from "express";
 import { z, ZodError } from "zod";
-import { ProductSchema, ProductVariantSchema } from "../../schema/Product";
+import { ProductSchema, ProductSchema2, ProductVariantSchema } from "../../schema/Product";
 import { generateUniqueSuffix } from "../../utils/common";
 import { attachPathToFiles } from "../../utils/fileUtils";
+import { parse } from "dotenv";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
   console.log(req.body);
@@ -87,4 +88,24 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
   const displayPrice = variants[parsedReq.body.defaultVariantIdx].price;
 
   return { body: parsedReq.body, files, productImages: productImagesWithPath, variantsImages, displayImage: displayImageWithPath, displayPrice };
+};
+
+export const validateAndProcessUpdateProductReq = async (req: Request) => {
+  const updateProductSchema = z.object({
+    body: ProductSchema.partial().strict(),
+
+    // multer .single(), which is the display image
+    file: z.unknown().optional(),
+  });
+
+  const parsedReq = await updateProductSchema.parseAsync(req);
+
+  const displayImage = parsedReq.file as Express.Multer.File | undefined;
+
+  let displayImageWithPath: Express.Multer.File | undefined;
+  if (displayImage) {
+    displayImageWithPath = attachPathToFiles([displayImage])[0];
+  }
+
+  return { body: parsedReq.body, displayImage: displayImageWithPath };
 };

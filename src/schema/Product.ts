@@ -25,3 +25,22 @@ export const ProductVariantSchema = z
     price: z.coerce.number().gt(0),
   })
   .strict();
+
+export const productFieldsValidation = {
+  name: z.string().min(1).max(255),
+  description: z.string().min(1).max(255),
+  quantity: z.number().gt(0),
+  price: z.number().gt(0),
+  display_image_url: z.string().min(1).max(255),
+  display_image_alt: z.string().min(1).max(255),
+};
+
+export const ProductSchema2 = z.object({
+  name: productFieldsValidation.name,
+  description: productFieldsValidation.description,
+  quantity: productFieldsValidation.quantity,
+  price: productFieldsValidation.price,
+  display_image_url: productFieldsValidation.display_image_url,
+});
+
+type c = z.infer<typeof ProductSchema2>;

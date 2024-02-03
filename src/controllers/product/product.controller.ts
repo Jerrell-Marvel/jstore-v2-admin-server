@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { addProduct, addProductWithVariants, updateProduct } from "../../services/product.service";
 import { StatusCodes } from "http-status-codes";
 import { addProductImages } from "../../services/productImage.service";
-import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq } from "../../requestHandlers/product/createProductReqHandlers";
+import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessUpdateProductReq } from "../../requestHandlers/product/productReqHandlers";
 import { pool } from "../../db";
 import { addProductVariants } from "../../services/productVariant.service";
 import { addVariantImages } from "../../services/variantImage.service";
@@ -78,4 +78,8 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
   } finally {
     client.release();
   }
+};
+
+export const updateProductController = async (req: Request, res: Response) => {
+  const { body, displayImage } = await validateAndProcessUpdateProductReq(req);
 };
