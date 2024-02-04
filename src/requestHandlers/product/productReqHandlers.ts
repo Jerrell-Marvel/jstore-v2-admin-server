@@ -4,6 +4,8 @@ import { ProductSchema, ProductSchema2, ProductVariantSchema } from "../../schem
 import { generateUniqueSuffix } from "../../utils/common";
 import { attachPathToFiles } from "../../utils/fileUtils";
 import { parse } from "dotenv";
+import { hasVariants } from "../../services/productVariant.service";
+import { BadRequestError } from "../../errors/BadRequestError";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
   console.log(req.body);
@@ -91,15 +93,28 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
 };
 
 export const validateAndProcessUpdateProductReq = async (req: Request) => {
-  const updateProductSchema = z.object({
-    body: ProductSchema.partial().strict(),
+  const updateProductSchema = z
+    .object({
+      body: ProductSchema.partial().strict(),
 
-    // multer .single(), which is the display image
-    file: z.unknown().optional(),
-  });
+      // multer .single(), which is the display image
+      file: z.unknown().optional(),
+
+      params: z.object({
+        productId: z.coerce.number(),
+      }),
+    })
+    .refine((data) => data.body.description || data.body.name || data.body.price || data.body.quantity || data.body.quantity === 0 || data.file, {
+      message: "cannot send empty data",
+    });
 
   const parsedReq = await updateProductSchema.parseAsync(req);
 
+  // make sure that if a product has variants then quantity and price field can't be updated
+  const isProductHasVariants = await hasVariants(parsedReq.params.productId);
+  if (isProductHasVariants && (parsedReq.body.quantity || parsedReq.body.price)) {
+    throw new BadRequestError("product with variants cannot have quantity and price field");
+  }
   const displayImage = parsedReq.file as Express.Multer.File | undefined;
 
   let displayImageWithPath: Express.Multer.File | undefined;
@@ -107,5 +122,5 @@ export const validateAndProcessUpdateProductReq = async (req: Request) => {
     displayImageWithPath = attachPathToFiles([displayImage])[0];
   }
 
-  return { body: parsedReq.body, displayImage: displayImageWithPath };
+  return { body: parsedReq.body, params: parsedReq.params, file: parsedReq.file, displayImage: displayImageWithPath };
 };

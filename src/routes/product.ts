@@ -1,7 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import { fileUpload } from "../middleware/fileUpload";
-import { createProduct, createProductWithVariants } from "../controllers/product/product.controller";
+import { createProduct, createProductWithVariants, updateProductController } from "../controllers/product/product.controller";
 import { productWithVariantsFileUpload } from "../middleware/productWithVariantsFileUpload";
+import { updateProduct } from "../services/product.service";
+import { memoryFileUpload } from "../middleware/memoryFileUpload";
 
 const router = express.Router();
 
@@ -24,5 +26,7 @@ router.post(
   ]),
   createProduct
 );
+
+router.patch("/:productId", memoryFileUpload().single("displayImage"), updateProductController);
 
 export default router;

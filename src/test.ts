@@ -30,3 +30,21 @@ export const HelloWorldController = {
   },
   // other requests...
 };
+
+type B<T> = {
+  name: T;
+};
+
+let result: B<string>;
+
+const fn = <T>(): B<T> => {
+  const myVar = "smrhg";
+
+  return {
+    name: myVar as T,
+  };
+};
+
+result = fn();
+
+const fn2 = (a: { name: string; age: number } = { name: "asep", age: 5 }) => {};

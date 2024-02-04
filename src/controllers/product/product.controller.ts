@@ -4,7 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import { addProductImages } from "../../services/productImage.service";
 import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessUpdateProductReq } from "../../requestHandlers/product/productReqHandlers";
 import { pool } from "../../db";
-import { addProductVariants } from "../../services/productVariant.service";
+import { addProductVariants, hasVariants } from "../../services/productVariant.service";
 import { addVariantImages } from "../../services/variantImage.service";
 import { saveFiles } from "../../utils/fileUtils";
 
@@ -81,5 +81,29 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
 };
 
 export const updateProductController = async (req: Request, res: Response) => {
-  const { body, displayImage } = await validateAndProcessUpdateProductReq(req);
+  const { body, displayImage, params } = await validateAndProcessUpdateProductReq(req);
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const updateData: typeof body & { display_image_url?: string } = body;
+
+    if (displayImage) {
+      updateData.display_image_url = displayImage.path;
+    }
+
+    const updatedProduct = await updateProduct(updateData, params.productId, client);
+
+    await client.query("COMMIT");
+
+    return res.json(updatedProduct);
+  } catch (e) {
+    await client.query("ROLLBACK");
+
+    return res.json(e);
+  } finally {
+    client.release();
+  }
 };

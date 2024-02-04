@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool, PoolClient, QueryResult } from "pg";
 import { pool } from "../db";
 import { InternalServerError } from "../errors/InternalServerError";
 import { Product, ProductVariant } from "../types/product";
@@ -59,33 +59,101 @@ export const updateProduct = async (
     price?: number;
     default_variant?: number;
     display_image_url?: string;
-    display_image_alt?: string;
   },
   productId: number,
-  client?: PoolClient
+  client: PoolClient
 ) => {
+  let placeHolderCount = 0;
+
   const keys = Object.keys(product);
   const values = Object.values(product);
 
-  const setClauses = keys.map((key, index) => `${key} = $${index + 1}`).join(", ");
+  const setClauses = keys.map((key, index) => `${key} = $${++placeHolderCount}`).join(", ");
 
-  const queryText = `UPDATE PRODUCTS SET ${setClauses} WHERE product_id = $${keys.length + 1}`;
+  const queryText = `UPDATE PRODUCTS SET ${setClauses} WHERE product_id = $${++placeHolderCount} RETURNING *;`;
+
   const queryValues = [...values, productId];
-
-  console.log(queryText);
-  console.log(queryValues);
 
   const query = {
     text: queryText,
     values: queryValues,
   };
 
-  let queryResult;
+  let queryResult: QueryResult;
   if (client) {
     queryResult = await client.query(query);
   } else {
     queryResult = await pool.query(query);
   }
 
-  console.log(queryResult);
+  const rows = queryResult.rows;
+
+  return rows[0];
 };
+
+// export const updateProduct = async (
+//   product: {
+//     name?: string;
+//     description?: string;
+//     quantity?: number;
+//     price?: number;
+//     default_variant?: number;
+//     display_image_url?: string;
+//   },
+//   productId: number,
+//   options: {
+//     client?: PoolClient;
+//     returnPrevDisplayImage?: boolean;
+//   } = {
+//     returnPrevDisplayImage: false,
+//   }
+// ) => {
+//   // if options.new is false will return pre-updated data, otherwise will return updated data
+//   let queryText = "";
+//   const queryValues: (string | number)[] = [];
+
+//   let placeHolderCount = 0;
+
+//   if (options.returnPrevDisplayImage) {
+//     queryText += `WITH before_update AS (
+//       SELECT display_image_url FROM products WHERE product_id = $${++placeHolderCount}
+//     ) `;
+//     queryValues.push(productId);
+//   }
+
+//   const keys = Object.keys(product);
+//   const values = Object.values(product);
+
+//   const setClauses = keys.map((key, index) => `${key} = $${++placeHolderCount}`).join(", ");
+
+//   queryText += `UPDATE PRODUCTS SET ${setClauses} WHERE product_id = $${++placeHolderCount} `;
+//   // const queryText =
+//   // const queryValues = [...values, productId];
+
+//   queryValues.push(...values, productId);
+
+//   if (options.returnPrevDisplayImage) {
+//     queryText += `RETURNING *, (SELECT display_image_url FROM before_update) AS prev_display_image_url;`;
+//   } else {
+//     queryText += `RETURNING *;`;
+//   }
+
+//   console.log(queryText);
+//   console.log(queryValues);
+
+//   const query = {
+//     text: queryText,
+//     values: queryValues,
+//   };
+
+//   let queryResult: QueryResult;
+//   if (options.client) {
+//     queryResult = await options.client.query(query);
+//   } else {
+//     queryResult = await pool.query(query);
+//   }
+
+//   const rows = queryResult.rows;
+
+//   return rows[0];
+// };
