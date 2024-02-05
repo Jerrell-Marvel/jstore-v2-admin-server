@@ -17,9 +17,13 @@ export const createProduct = async (req: Request, res: Response) => {
     await client.query("BEGIN");
     const productId = await addProduct({ ...body, displayImageUrl: displayImage.path }, client);
 
+    const imagesToSave = [displayImage];
     if (productImages) {
+      imagesToSave.push(...productImages);
       await addProductImages(productImages, productId, client);
     }
+
+    await saveFiles(imagesToSave);
 
     await client.query("COMMIT");
 

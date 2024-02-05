@@ -61,7 +61,7 @@ export const updateProduct = async (
     display_image_url?: string;
   },
   productId: number,
-  client: PoolClient
+  client?: PoolClient
 ) => {
   let placeHolderCount = 0;
 

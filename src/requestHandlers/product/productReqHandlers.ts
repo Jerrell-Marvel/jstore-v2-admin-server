@@ -8,8 +8,6 @@ import { hasVariants } from "../../services/productVariant.service";
 import { BadRequestError } from "../../errors/BadRequestError";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
-  console.log(req.body);
-  console.log(typeof req.body.productImages);
   const CreateProductReqSchema = z.object({
     body: ProductSchema,
     files: z

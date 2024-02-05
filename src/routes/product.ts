@@ -13,7 +13,7 @@ router.post("/variants", productWithVariantsFileUpload, createProductWithVariant
 
 router.post(
   "/",
-  fileUpload("./public/product-images").fields([
+  memoryFileUpload().fields([
     {
       name: "displayImage",
       maxCount: 1,
