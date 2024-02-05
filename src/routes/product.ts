@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import { fileUpload } from "../middleware/fileUpload";
-import { createProduct, createProductWithVariants, updateProductController } from "../controllers/product/product.controller";
+import { createProduct, createProductWithVariants, updateProductController } from "../controllers/product.controller";
 import { productWithVariantsFileUpload } from "../middleware/productWithVariantsFileUpload";
 import { updateProduct } from "../services/product.service";
 import { memoryFileUpload } from "../middleware/memoryFileUpload";

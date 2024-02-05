@@ -1,11 +1,11 @@
 import { Request } from "express";
 import { z, ZodError } from "zod";
-import { ProductSchema, ProductSchema2, ProductVariantSchema } from "../../schema/Product";
-import { generateUniqueSuffix } from "../../utils/common";
-import { attachPathToFiles } from "../../utils/fileUtils";
+import { ProductSchema, ProductSchema2, ProductVariantSchema } from "../schema/Product";
+import { generateUniqueSuffix } from "../utils/common";
+import { attachPathToFiles } from "../utils/fileUtils";
 import { parse } from "dotenv";
-import { hasVariants } from "../../services/productVariant.service";
-import { BadRequestError } from "../../errors/BadRequestError";
+import { hasVariants } from "../services/productVariant.service";
+import { BadRequestError } from "../errors/BadRequestError";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
   const CreateProductReqSchema = z.object({

@@ -30,16 +30,19 @@ app.use(express.json());
 
 import { z } from "zod";
 
-app.get("/test", (req: Request, res: Response) => {
-  updateProduct(
-    {
-      name: "eits",
-      price: 5000,
-    },
-    5
-  );
+app.get("/test", async (req: Request, res: Response) => {
+  const result = await pool.query(`DO
+  $$
+  DECLARE
+      variant_count INT;
+  BEGIN 
+      SELECT COUNT(*) INTO variant_count FROM product_images WHERE product_id = 80;
+  
+      RAISE EXCEPTION '%', variant_count;
+  END
+  $$`);
 
-  return res.json("yeya");
+  return res.json(result);
   // const schema = z.object({
   //   name: z.number(),
   // });
@@ -67,9 +70,11 @@ app.post("/example", (req, res) => {
 
 // routes
 import productRoutes from "./routes/product";
+import productImageRoutes from "./routes/productImage";
 import { updateProduct } from "./services/product.service";
 
 app.use("/product", productRoutes);
+app.use("/productImage", productImageRoutes);
 
 // app.use(errorHandler);
 

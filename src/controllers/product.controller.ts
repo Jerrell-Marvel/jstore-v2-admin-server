@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { addProduct, addProductWithVariants, updateProduct } from "../../services/product.service";
+import { addProduct, addProductWithVariants, updateProduct } from "../services/product.service";
 import { StatusCodes } from "http-status-codes";
-import { addProductImages } from "../../services/productImage.service";
-import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessUpdateProductReq } from "../../requestHandlers/product/productReqHandlers";
-import { pool } from "../../db";
-import { addProductVariants, hasVariants } from "../../services/productVariant.service";
-import { addVariantImages } from "../../services/variantImage.service";
-import { saveFiles } from "../../utils/fileUtils";
+import { addProductImages } from "../services/productImage.service";
+import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessUpdateProductReq } from "../requestHandlers/productReqHandlers";
+import { pool } from "../db";
+import { addProductVariants, hasVariants } from "../services/productVariant.service";
+import { addVariantImages } from "../services/variantImage.service";
+import { saveFiles } from "../utils/fileUtils";
 
 export const createProduct = async (req: Request, res: Response) => {
   const { body, files, displayImage, productImages } = await validateAndProcessCreateProductReq(req);
@@ -20,7 +20,7 @@ export const createProduct = async (req: Request, res: Response) => {
     const imagesToSave = [displayImage];
     if (productImages) {
       imagesToSave.push(...productImages);
-      await addProductImages(productImages, productId, client);
+      await addProductImages(productImages, productId, { client, performCheck: true });
     }
 
     await saveFiles(imagesToSave);
@@ -54,7 +54,7 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
     // to save it to product_images table
     if (productImages) {
       imagesToSave.push(...productImages);
-      await addProductImages(productImages, productId, client);
+      await addProductImages(productImages, productId, { client });
     }
 
     const variantIdWithImages = productVariantIds.map((id, idx) => {
