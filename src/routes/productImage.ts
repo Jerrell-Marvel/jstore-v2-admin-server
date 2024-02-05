@@ -5,4 +5,6 @@ const router = express.Router();
 
 router.post("/:productId", memoryFileUpload().single("productImage"), addProductImage);
 
+router.delete("/:productImageId");
+
 export default router;

@@ -46,3 +46,18 @@ export const addProductImages = async (images: Express.Multer.File[], productId:
   // const result = rows.map((row) => row.product_image_id);
   // return result;
 };
+
+export const deleteProductImage = async (productImageId: number, client?: PoolClient) => {
+  const queryText = `DELETE FROM product_images WHERE product_image_id=$1;`;
+
+  const query = {
+    text: queryText,
+    values: [productImageId],
+  };
+
+  if (client) {
+    await client.query(query);
+  } else {
+    await pool.query(query);
+  }
+};

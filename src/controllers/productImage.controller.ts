@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import * as productImageService from "../services/productImage.service";
-import { validateAndProcessCreateProductImageReq } from "../requestHandlers/productImageReqHandler";
+import { validateAndProcessCreateProductImageReq, validateAndProcessDeleteProductImageReq } from "../requestHandlers/productImageReqHandler";
 import { pool } from "../db";
 import { saveFiles } from "../utils/fileUtils";
 
@@ -27,4 +27,10 @@ export const addProductImage = async (req: Request, res: Response) => {
   } finally {
     client.release();
   }
+};
+
+export const deleteProductImage = async (req: Request, res: Response) => {
+  const {
+    params: { productImageId },
+  } = await validateAndProcessDeleteProductImageReq(req);
 };

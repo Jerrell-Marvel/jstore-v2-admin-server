@@ -23,3 +23,13 @@ export const validateAndProcessCreateProductImageReq = async (req: Request) => {
 
   return { params: parsedReq.params, productImage: productImageWithPath };
 };
+
+export const validateAndProcessDeleteProductImageReq = async (req: Request) => {
+  const schema = z.object({
+    params: z.object({
+      productImageId: z.coerce.number(),
+    }),
+  });
+
+  return await schema.parseAsync(req);
+};
