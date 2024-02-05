@@ -8,8 +8,6 @@ import { hasVariants } from "../../services/productVariant.service";
 import { BadRequestError } from "../../errors/BadRequestError";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
-  console.log(req.body);
-  console.log(typeof req.body.productImages);
   const CreateProductReqSchema = z.object({
     body: ProductSchema,
     files: z
@@ -39,14 +37,30 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
     .object({
       name: z.string().trim().min(1).max(255),
       description: z.string().trim().min(1).max(255),
-      variants: z.array(ProductVariantSchema).nonempty().max(10),
-      defaultVariantIdx: z.coerce.number().gte(0).max(9),
+      quantity: z.coerce.number().gt(0).optional(),
+      price: z.coerce.number().gt(0).optional(),
+      variants: z.array(ProductVariantSchema).nonempty().max(10).optional(),
+      defaultVariantIdx: z.coerce.number().gte(0).max(9).optional(),
     })
     .strict()
-    .refine((data) => data.defaultVariantIdx < data.variants.length, {
-      message: "invalid defaultVariantIdx field (variant doesn't exist)",
-      path: ["defaultVariantIdx"],
-    });
+    .refine((data) => (data.variants ? !data.quantity && !data.price : true), {
+      message: "product with variants can't have quantity and price",
+      path: ["quantity", "price"],
+    })
+
+    .refine(
+      (data) => {
+        if (data.variants) {
+          return data.defaultVariantIdx ? data.defaultVariantIdx < data.variants?.length : false;
+        }
+
+        return true;
+      },
+      {
+        message: "defaultVariantIdx field is required and must be less than the number of variants",
+        path: ["defaultVariantIdx"],
+      }
+    );
   // files
 
   //variant image files don't hv to be validated again because of multer, only check display image
@@ -72,24 +86,28 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
   // process product images
   const productImagesWithPath = files.productImages && attachPathToFiles(files.productImages);
 
-  // process variant images
-  // will contain array of multer file array, same index with variants array
-  const variantsImages: Express.Multer.File[][] = [];
+  if (parsedReq.body.variants) {
+    // process variant images
+    // will contain array of multer file array, same index with variants array
+    const variantsImages: Express.Multer.File[][] = [];
 
-  for (let i = 0; i < parsedReq.body.variants.length; i++) {
-    const images = files[`variants[${i}][images]`] || [];
+    for (let i = 0; i < parsedReq.body.variants.length; i++) {
+      const images = files[`variants[${i}][images]`] || [];
 
-    // attaching path to each variantImage
-    const imagesWithPath = attachPathToFiles(images);
+      // attaching path to each variantImage
+      const imagesWithPath = attachPathToFiles(images);
 
-    variantsImages.push(imagesWithPath);
+      variantsImages.push(imagesWithPath);
+    }
+
+    // process display price
+    const variants = parsedReq.body.variants;
+    const displayPrice = variants[parsedReq.body.defaultVariantIdx!].price;
+
+    return { body: parsedReq.body, files, productImages: productImagesWithPath, hasVariants: true, variantsImages, displayImage: displayImageWithPath, displayPrice };
   }
 
-  // process display price
-  const variants = parsedReq.body.variants;
-  const displayPrice = variants[parsedReq.body.defaultVariantIdx].price;
-
-  return { body: parsedReq.body, files, productImages: productImagesWithPath, variantsImages, displayImage: displayImageWithPath, displayPrice };
+  return { body: parsedReq.body, files, displayImage: displayImageWithPath, productImages: productImagesWithPath };
 };
 
 export const validateAndProcessUpdateProductReq = async (req: Request) => {
