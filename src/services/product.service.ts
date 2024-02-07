@@ -6,14 +6,15 @@ import { addProductImages } from "./productImage.service";
 
 export const addProduct = async (productData: Product & { displayImageUrl: string }, client?: PoolClient) => {
   const { name, description, quantity, price, displayImageUrl } = productData;
+
   const query = {
     text: `
-        INSERT INTO products (name, description, quantity, price, display_price, display_image_url)
+        INSERT INTO products (name, description, quantity, price, display_price, display_image_url, has_variants)
         VALUES
-        ($1, $2, $3, $4, $5, $6)
+        ($1, $2, $3, $4, $5, $6, $7)
         RETURNING product_id;
         `,
-    values: [name, description, quantity, price, price, displayImageUrl],
+    values: [name, description, quantity, price, price, displayImageUrl, false],
   };
 
   let result;
@@ -33,12 +34,12 @@ export const addProductWithVariants = async (productData: { name: string; descri
 
   const query = {
     text: `
-      INSERT INTO products (name, description, display_price, display_image_url)
+      INSERT INTO products (name, description, display_price, display_image_url, has_variants)
       VALUES
-      ($1, $2, $3, $4)
+      ($1, $2, $3, $4, $5)
       RETURNING product_id;
       `,
-    values: [name, description, displayPrice, displayImageUrl],
+    values: [name, description, displayPrice, displayImageUrl, true],
   };
 
   let result;
@@ -59,6 +60,7 @@ export const updateProduct = async (
     price?: number;
     default_variant?: number;
     display_image_url?: string;
+    has_variants?: boolean;
   },
   productId: number,
   client?: PoolClient
@@ -86,9 +88,7 @@ export const updateProduct = async (
     queryResult = await pool.query(query);
   }
 
-  const rows = queryResult.rows;
-
-  return rows[0];
+  return queryResult;
 };
 
 // export const updateProduct = async (

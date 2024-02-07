@@ -28,11 +28,11 @@ export const addProductVariants = async (variants: ProductVariant[], productId: 
 
 export const hasVariants = async (productId: number, client?: PoolClient) => {
   const query = {
-    text: `SELECT EXISTS(SELECT 1 FROM product_variants WHERE product_id=$1);`,
+    text: `SELECT has_variants FROM products WHERE product_id=$1`,
     values: [productId],
   };
 
-  let queryResult: QueryResult<{ exists: boolean }>;
+  let queryResult: QueryResult<{ has_variants: boolean }>;
 
   if (client) {
     queryResult = await client.query(query);
@@ -40,9 +40,5 @@ export const hasVariants = async (productId: number, client?: PoolClient) => {
     queryResult = await pool.query(query);
   }
 
-  const test = await pool.query<{ exists: boolean }>(query);
-
-  const rows = queryResult.rows;
-
-  return rows[0].exists;
+  return queryResult;
 };

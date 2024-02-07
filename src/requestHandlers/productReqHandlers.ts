@@ -109,8 +109,13 @@ export const validateAndProcessUpdateProductReq = async (req: Request) => {
   const parsedReq = await updateProductSchema.parseAsync(req);
 
   // make sure that if a product has variants then quantity and price field can't be updated
-  const isProductHasVariants = await hasVariants(parsedReq.params.productId);
-  if (isProductHasVariants && (parsedReq.body.quantity || parsedReq.body.price)) {
+  const hasVariantsResult = await hasVariants(parsedReq.params.productId);
+
+  if (hasVariantsResult.rowCount === 0) {
+    throw new BadRequestError("product doesn't exist");
+  }
+
+  if (hasVariantsResult.rows[0].has_variants && (parsedReq.body.quantity || parsedReq.body.price)) {
     throw new BadRequestError("product with variants cannot have quantity and price field");
   }
   const displayImage = parsedReq.file as Express.Multer.File | undefined;

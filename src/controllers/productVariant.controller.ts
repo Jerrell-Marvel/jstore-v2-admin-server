@@ -4,21 +4,24 @@ import { pool } from "../db";
 import { addProductVariants, hasVariants } from "../services/productVariant.service";
 import { addVariantImages } from "../services/variantImage.service";
 import { saveFiles } from "../utils/fileUtils";
+import { updateProduct } from "../services/product.service";
 
 export const createProductVariant = async (req: Request, res: Response) => {
-  const { body, variantImages, params } = await validateAndProcessCreateProductVariantReq(req);
+  const { body, variantImages, params, isProductHasVariants } = await validateAndProcessCreateProductVariantReq(req);
 
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
 
-    const isProductHasVariants = await hasVariants(params.productId);
-
     // spread operator is save to use due to .strict() on the body
     const variantIds = await addProductVariants([{ ...body }], params.productId, client);
 
     const variantId = variantIds[0];
+
+    if (!isProductHasVariants) {
+      await updateProduct({ price: undefined, quantity: undefined, default_variant: variantId, has_variants: true }, params.productId, client);
+    }
 
     if (variantImages) {
       await addVariantImages(

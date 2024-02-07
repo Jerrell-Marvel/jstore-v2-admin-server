@@ -7,6 +7,7 @@ import { pool } from "../db";
 import { addProductVariants, hasVariants } from "../services/productVariant.service";
 import { addVariantImages } from "../services/variantImage.service";
 import { saveFiles } from "../utils/fileUtils";
+import { BadRequestError } from "../errors/BadRequestError";
 
 export const createProduct = async (req: Request, res: Response) => {
   const { body, files, displayImage, productImages } = await validateAndProcessCreateProductReq(req);
@@ -98,11 +99,15 @@ export const updateProductController = async (req: Request, res: Response) => {
       updateData.display_image_url = displayImage.path;
     }
 
-    const updatedProduct = await updateProduct(updateData, params.productId, client);
+    const result = await updateProduct(updateData, params.productId, client);
+
+    if (result.rowCount === 0) {
+      throw new BadRequestError("product doesn't exist");
+    }
 
     await client.query("COMMIT");
 
-    return res.json(updatedProduct);
+    return res.json(result);
   } catch (e) {
     await client.query("ROLLBACK");
 
