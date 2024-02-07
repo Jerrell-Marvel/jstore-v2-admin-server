@@ -1,7 +1,8 @@
 import format from "pg-format";
 import { pool } from "../db";
-import { PoolClient } from "pg";
+import { PoolClient, QueryResult } from "pg";
 
+// if perform check is true make sure to have client
 export const addProductImages = async (images: Express.Multer.File[], productId: number, options: { client?: PoolClient; performCheck?: boolean } = { performCheck: false }) => {
   if (images.length === 0) {
     return [];
@@ -15,11 +16,13 @@ export const addProductImages = async (images: Express.Multer.File[], productId:
       `DO
    $$
    DECLARE
-       variant_count INT;
+       image_count INT;
    BEGIN 
-       SELECT COUNT(*) INTO variant_count FROM product_images WHERE product_id = %L FOR UPDATE;
+       PERFORM pg_try_advisory_xact_lock(12345);
+
+       SELECT COUNT(*) INTO image_count FROM product_images WHERE product_id = %L;
    
-       IF (8-variant_count >= %L) THEN
+       IF (8-image_count >= %L) THEN
            INSERT INTO product_images (image_url, product_id) VALUES %L;
        ELSE
            RAISE EXCEPTION 'too many product-images';
@@ -55,9 +58,12 @@ export const deleteProductImage = async (productImageId: number, client?: PoolCl
     values: [productImageId],
   };
 
+  let queryResult: QueryResult;
   if (client) {
-    await client.query(query);
+    queryResult = await client.query(query);
   } else {
-    await pool.query(query);
+    queryResult = await pool.query(query);
   }
+
+  return queryResult;
 };
