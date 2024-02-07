@@ -17,7 +17,7 @@ export const addProductImages = async (images: Express.Multer.File[], productId:
    DECLARE
        variant_count INT;
    BEGIN 
-       SELECT COUNT(*) INTO variant_count FROM product_images WHERE product_id = %L;
+       SELECT COUNT(*) INTO variant_count FROM product_images WHERE product_id = %L FOR UPDATE;
    
        IF (8-variant_count >= %L) THEN
            INSERT INTO product_images (image_url, product_id) VALUES %L;

@@ -16,22 +16,14 @@ export const validateAndProcessCreateProductVariantReq = async (req: Request) =>
 
   const parsedReq = await schema.parseAsync(req);
 
-  // check if product exist0 and check if the product already have variants
-  const hasVariantsResult = await hasVariants(parsedReq.params.productId);
-  if (hasVariantsResult.rowCount === 0) {
-    throw new BadRequestError("product doesn't exist");
-  }
-
-  const isProductHasVariants = hasVariantsResult.rows[0].has_variants;
-
   const variantImages = parsedReq.files as Express.Multer.File[] | undefined;
 
   let variantImagesWithPath: Express.Multer.File[];
   if (variantImages) {
     variantImagesWithPath = attachPathToFiles(variantImages);
 
-    return { body: parsedReq.body, params: parsedReq.params, variantImages: variantImagesWithPath, isProductHasVariants };
+    return { body: parsedReq.body, params: parsedReq.params, variantImages: variantImagesWithPath };
   }
 
-  return { body: parsedReq.body, params: parsedReq.params, variantImages, isProductHasVariants };
+  return { body: parsedReq.body, params: parsedReq.params, variantImages };
 };

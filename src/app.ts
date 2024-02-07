@@ -31,16 +31,7 @@ app.use(express.json());
 import { z } from "zod";
 
 app.get("/test", async (req: Request, res: Response) => {
-  const result = await pool.query(`DO
-  $$
-  DECLARE
-      variant_count INT;
-  BEGIN 
-      SELECT COUNT(*) INTO variant_count FROM product_images WHERE product_id = 80;
-  
-      RAISE EXCEPTION '%', variant_count;
-  END
-  $$`);
+  const result = await pool.query(`UPDATE products SET name='sdlkfsdklj' WHERE product_id=2`);
 
   return res.json(result);
   // const schema = z.object({

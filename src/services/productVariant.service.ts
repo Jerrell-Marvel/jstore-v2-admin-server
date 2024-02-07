@@ -28,7 +28,7 @@ export const addProductVariants = async (variants: ProductVariant[], productId: 
 
 export const hasVariants = async (productId: number, client?: PoolClient) => {
   const query = {
-    text: `SELECT has_variants FROM products WHERE product_id=$1`,
+    text: `SELECT has_variants FROM products WHERE product_id=$1 FOR UPDATE;`,
     values: [productId],
   };
 

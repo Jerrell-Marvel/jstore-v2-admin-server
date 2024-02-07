@@ -21,7 +21,7 @@ export const createProduct = async (req: Request, res: Response) => {
     const imagesToSave = [displayImage];
     if (productImages) {
       imagesToSave.push(...productImages);
-      await addProductImages(productImages, productId, { client, performCheck: true });
+      await addProductImages(productImages, productId, { client });
     }
 
     await saveFiles(imagesToSave);
@@ -93,10 +93,22 @@ export const updateProductController = async (req: Request, res: Response) => {
   try {
     await client.query("BEGIN");
 
+    // make sure that if a product has variants then quantity and price field can't be updated
+    const hasVariantsResult = await hasVariants(params.productId, client);
+
+    if (hasVariantsResult.rowCount === 0) {
+      throw new BadRequestError("product doesn't exist");
+    }
+
+    if (hasVariantsResult.rows[0].has_variants && (body.quantity || body.price)) {
+      throw new BadRequestError("product with variants cannot have quantity and price field");
+    }
+
     const updateData: typeof body & { display_image_url?: string } = body;
 
     if (displayImage) {
       updateData.display_image_url = displayImage.path;
+      await saveFiles([displayImage]);
     }
 
     const result = await updateProduct(updateData, params.productId, client);
