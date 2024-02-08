@@ -1,27 +1,31 @@
 import { Request, Response } from "express";
-import { addProduct, addProductWithVariants, updateProduct } from "../services/product.service";
+
 import { StatusCodes } from "http-status-codes";
-import { addProductImages } from "../services/productImage.service";
+
 import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessUpdateProductReq } from "../requestHandlers/productReqHandlers";
 import { pool } from "../db";
-import { addProductVariants, hasVariants } from "../services/productVariant.service";
-import { addMultipleVariantImages } from "../services/variantImage.service";
+
 import { saveFiles } from "../utils/fileUtils";
 import { BadRequestError } from "../errors/BadRequestError";
+import productService from "../services/product.service";
+import productImageService from "../services/productImage.service";
+import productVariantService from "../services/productVariant.service";
+import variantImageService from "../services/variantImage.service";
 
-export const createProduct = async (req: Request, res: Response) => {
+const createProduct = async (req: Request, res: Response) => {
   const { body, files, displayImage, productImages } = await validateAndProcessCreateProductReq(req);
 
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
-    const productId = await addProduct({ ...body, displayImageUrl: displayImage.path }, client);
+    const productId = await productService.addProduct({ ...body, displayImageUrl: displayImage.path }, client);
 
     const imagesToSave = [displayImage];
     if (productImages) {
       imagesToSave.push(...productImages);
-      await addProductImages(productImages, productId, { client });
+
+      await productImageService.addProductImages(productImages, productId, { client });
     }
 
     await saveFiles(imagesToSave);
@@ -37,7 +41,7 @@ export const createProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const createProductWithVariants = async (req: Request, res: Response) => {
+const createProductWithVariants = async (req: Request, res: Response) => {
   // return res.json(req.files);
   const { body, files, variantsImages, displayImage, displayPrice, productImages } = await validateAndProcessCreateProductWithVariantsReq(req);
 
@@ -46,16 +50,16 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
   try {
     await client.query("BEGIN");
 
-    const productId = await addProductWithVariants({ name: body.name, description: body.description, displayImageUrl: displayImage.path, displayPrice }, client);
+    const productId = await productService.addProductWithVariants({ name: body.name, description: body.description, displayImageUrl: displayImage.path, displayPrice }, client);
 
-    const productVariantIds = await addProductVariants(body.variants, productId, client);
+    const productVariantIds = await productVariantService.addProductVariants(body.variants, productId, client);
 
     const imagesToSave = [displayImage];
 
     // to save it to product_images table
     if (productImages) {
       imagesToSave.push(...productImages);
-      await addProductImages(productImages, productId, { client });
+      await productImageService.addProductImages(productImages, productId, { client });
     }
 
     const variantIdWithImages = productVariantIds.map((id, idx) => {
@@ -67,11 +71,11 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
         variantImages: images,
       };
     });
-    await addMultipleVariantImages(variantIdWithImages, client);
+    await variantImageService.createMultipleVariantImages(variantIdWithImages, client);
 
     await saveFiles(imagesToSave);
 
-    await updateProduct({ default_variant: productVariantIds[body.defaultVariantIdx] }, productId, client);
+    await productService.updateProduct({ default_variant: productVariantIds[body.defaultVariantIdx] }, productId, client);
 
     await client.query("COMMIT");
 
@@ -85,7 +89,7 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
   }
 };
 
-export const updateProductController = async (req: Request, res: Response) => {
+const updateProduct = async (req: Request, res: Response) => {
   const { body, displayImage, params } = await validateAndProcessUpdateProductReq(req);
 
   const client = await pool.connect();
@@ -94,7 +98,7 @@ export const updateProductController = async (req: Request, res: Response) => {
     await client.query("BEGIN");
 
     // make sure that if a product has variants then quantity and price field can't be updated
-    const hasVariantsResult = await hasVariants(params.productId, client);
+    const hasVariantsResult = await productVariantService.hasVariants(params.productId, client);
 
     if (hasVariantsResult.rowCount === 0) {
       throw new BadRequestError("product doesn't exist");
@@ -111,7 +115,7 @@ export const updateProductController = async (req: Request, res: Response) => {
       await saveFiles([displayImage]);
     }
 
-    const result = await updateProduct(updateData, params.productId, client);
+    const result = await productService.updateProduct(updateData, params.productId, client);
 
     if (result.rowCount === 0) {
       throw new BadRequestError("product doesn't exist");
@@ -127,4 +131,10 @@ export const updateProductController = async (req: Request, res: Response) => {
   } finally {
     client.release();
   }
+};
+
+export default {
+  createProduct,
+  createProductWithVariants,
+  updateProduct,
 };

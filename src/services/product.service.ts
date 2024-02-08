@@ -1,10 +1,9 @@
-import { Pool, PoolClient, QueryResult } from "pg";
+import { PoolClient, QueryResult } from "pg";
 import { pool } from "../db";
 import { InternalServerError } from "../errors/InternalServerError";
 import { Product, ProductVariant } from "../types/product";
-import { addProductImages } from "./productImage.service";
 
-export const addProduct = async (productData: Product & { displayImageUrl: string }, client?: PoolClient) => {
+const addProduct = async (productData: Product & { displayImageUrl: string }, client?: PoolClient) => {
   const { name, description, quantity, price, displayImageUrl } = productData;
 
   const query = {
@@ -27,7 +26,7 @@ export const addProduct = async (productData: Product & { displayImageUrl: strin
   return result.rows[0].product_id as number;
 };
 
-export const addProductWithVariants = async (productData: { name: string; description: string; displayPrice: number; displayImageUrl: string }, client?: PoolClient) => {
+const addProductWithVariants = async (productData: { name: string; description: string; displayPrice: number; displayImageUrl: string }, client?: PoolClient) => {
   const { name, description, displayImageUrl, displayPrice } = productData;
 
   // const displayPrice = variants[defaultVariantIdx].price;
@@ -52,7 +51,7 @@ export const addProductWithVariants = async (productData: { name: string; descri
   return result.rows[0].product_id as number;
 };
 
-export const updateProduct = async (
+const updateProduct = async (
   product: {
     name?: string;
     description?: string;
@@ -89,6 +88,12 @@ export const updateProduct = async (
   }
 
   return queryResult;
+};
+
+export default {
+  addProduct,
+  addProductWithVariants,
+  updateProduct,
 };
 
 // export const updateProduct = async (

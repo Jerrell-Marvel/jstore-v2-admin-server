@@ -2,8 +2,6 @@ import { ProductVariantSchema } from "../schema/Product";
 import { z } from "zod";
 import { attachPathToFiles } from "../utils/fileUtils";
 import { Request } from "express";
-import { hasVariants } from "../services/productVariant.service";
-import { BadRequestError } from "../errors/BadRequestError";
 
 export const validateAndProcessCreateProductVariantReq = async (req: Request) => {
   const schema = z.object({

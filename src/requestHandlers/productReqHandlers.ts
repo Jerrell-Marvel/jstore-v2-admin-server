@@ -4,7 +4,7 @@ import { ProductSchema, ProductSchema2, ProductVariantSchema } from "../schema/P
 import { generateUniqueSuffix } from "../utils/common";
 import { attachPathToFiles } from "../utils/fileUtils";
 import { parse } from "dotenv";
-import { hasVariants } from "../services/productVariant.service";
+
 import { BadRequestError } from "../errors/BadRequestError";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {

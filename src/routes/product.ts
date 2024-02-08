@@ -1,15 +1,16 @@
 import express, { NextFunction, Request, Response } from "express";
 import { fileUpload } from "../middleware/fileUpload";
-import { createProduct, createProductWithVariants, updateProductController } from "../controllers/product.controller";
+productController;
 import { productWithVariantsFileUpload } from "../middleware/productWithVariantsFileUpload";
-import { updateProduct } from "../services/product.service";
+
 import { memoryFileUpload } from "../middleware/memoryFileUpload";
+import productController from "../controllers/product.controller";
 
 const router = express.Router();
 
 // router.post("/variants", fileUpload("./public/product-images").any(), createProductWithVariants);
 
-router.post("/variants", productWithVariantsFileUpload, createProductWithVariants);
+router.post("/variants", productWithVariantsFileUpload, productController.createProductWithVariants);
 
 router.post(
   "/",
@@ -24,9 +25,9 @@ router.post(
       maxCount: 8,
     },
   ]),
-  createProduct
+  productController.createProduct
 );
 
-router.patch("/:productId", memoryFileUpload().single("displayImage"), updateProductController);
+router.patch("/:productId", memoryFileUpload().single("displayImage"), productController.updateProduct);
 
 export default router;

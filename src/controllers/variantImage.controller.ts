@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { validateAndProcessAddProductImageReq } from "../requestHandlers/variantImageReqHandler";
 import { pool } from "../db";
-
-import * as variantImageService from "../services/variantImage.service";
 import { BadRequestError } from "../errors/BadRequestError";
 import { saveFiles } from "../utils/fileUtils";
+import variantImageService from "../services/variantImage.service";
+
 const addVariantImages = async (req: Request, res: Response) => {
   const { params, variantImages } = await validateAndProcessAddProductImageReq(req);
 

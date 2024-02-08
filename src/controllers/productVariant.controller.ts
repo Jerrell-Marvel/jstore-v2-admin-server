@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
 import { validateAndProcessCreateProductVariantReq, validateAndProcessUpdateProductVariantReq } from "../requestHandlers/productVariantReqHandler";
 import { pool } from "../db";
-import * as productVariantService from "../services/productVariant.service";
-import { addMultipleVariantImages } from "../services/variantImage.service";
+
 import { saveFiles } from "../utils/fileUtils";
-import { updateProduct } from "../services/product.service";
+
 import { BadRequestError } from "../errors/BadRequestError";
 
-export const createProductVariant = async (req: Request, res: Response) => {
+import productService from "../services/product.service";
+import productVariantService from "../services/productVariant.service";
+import variantImageService from "../services/variantImage.service";
+
+const createProductVariant = async (req: Request, res: Response) => {
   const { body, variantImages, params } = await validateAndProcessCreateProductVariantReq(req);
 
   const client = await pool.connect();
@@ -27,11 +30,11 @@ export const createProductVariant = async (req: Request, res: Response) => {
     const variantId = variantIds[0];
 
     if (!isProductHasVariants) {
-      await updateProduct({ price: undefined, quantity: undefined, default_variant: variantId, has_variants: true }, params.productId, client);
+      await productService.updateProduct({ price: undefined, quantity: undefined, default_variant: variantId, has_variants: true }, params.productId, client);
     }
 
     if (variantImages) {
-      await addMultipleVariantImages(
+      await variantImageService.createMultipleVariantImages(
         [
           {
             variantId,
@@ -54,7 +57,7 @@ export const createProductVariant = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProductVariant = async (req: Request, res: Response) => {
+const updateProductVariant = async (req: Request, res: Response) => {
   const { body, params } = await validateAndProcessUpdateProductVariantReq(req);
   console.log("here");
 
@@ -65,4 +68,9 @@ export const updateProductVariant = async (req: Request, res: Response) => {
   }
 
   return res.json(updateProductVariantResult);
+};
+
+export default {
+  createProductVariant,
+  updateProductVariant,
 };

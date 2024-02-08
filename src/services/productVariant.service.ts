@@ -3,7 +3,7 @@ import { ProductVariant } from "../types/product";
 import format from "pg-format";
 import { pool } from "../db";
 
-export const addProductVariants = async (variants: ProductVariant[], productId: number, client?: PoolClient) => {
+const addProductVariants = async (variants: ProductVariant[], productId: number, client?: PoolClient) => {
   const variantValues = variants.map((variant) => [productId, variant.name, variant.price, variant.quantity]);
 
   const query = format(
@@ -26,7 +26,7 @@ export const addProductVariants = async (variants: ProductVariant[], productId: 
   return result;
 };
 
-export const hasVariants = async (productId: number, client?: PoolClient) => {
+const hasVariants = async (productId: number, client?: PoolClient) => {
   const query = {
     text: `SELECT has_variants FROM products WHERE product_id=$1 FOR UPDATE;`,
     values: [productId],
@@ -43,7 +43,7 @@ export const hasVariants = async (productId: number, client?: PoolClient) => {
   return queryResult;
 };
 
-export const updateProductVariant = async (
+const updateProductVariant = async (
   product: {
     name?: string;
     quantity?: number;
@@ -76,4 +76,10 @@ export const updateProductVariant = async (
   }
 
   return queryResult;
+};
+
+export default {
+  addProductVariants,
+  hasVariants,
+  updateProductVariant,
 };
