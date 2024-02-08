@@ -37,7 +37,7 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
     .object({
       name: z.string().trim().min(1).max(255),
       description: z.string().trim().min(1).max(255),
-      variants: z.array(ProductVariantSchema).nonempty().max(10),
+      variants: z.array(ProductVariantSchema.strict()).nonempty().max(10),
       defaultVariantIdx: z.coerce.number().gte(0).max(9),
     })
     .strict()

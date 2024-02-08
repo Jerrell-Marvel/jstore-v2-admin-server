@@ -53,3 +53,5 @@ export const createProductVariant = async (req: Request, res: Response) => {
     client.release();
   }
 };
+
+export const updateProductVariant = async (req: Request, res: Response) => {};
