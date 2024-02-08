@@ -63,11 +63,13 @@ app.post("/example", (req, res) => {
 import productRoutes from "./routes/product";
 import productImageRoutes from "./routes/productImage";
 import productVariantRoutes from "./routes/productVariant";
+import variantImageRoutes from "./routes/variantImage";
 import { updateProduct } from "./services/product.service";
 
 app.use("/product", productRoutes);
 app.use("/productImage", productImageRoutes);
 app.use("/productVariant", productVariantRoutes);
+app.use("/variantImage", variantImageRoutes);
 // app.use(errorHandler);
 
 // connect

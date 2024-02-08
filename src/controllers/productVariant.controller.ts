@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { validateAndProcessCreateProductVariantReq, validateAndProcessUpdateProductVariantReq } from "../requestHandlers/productVariantReqHandler";
 import { pool } from "../db";
 import * as productVariantService from "../services/productVariant.service";
-import { addMultipleVariantImages, addVariantImages } from "../services/variantImage.service";
+import { addMultipleVariantImages } from "../services/variantImage.service";
 import { saveFiles } from "../utils/fileUtils";
 import { updateProduct } from "../services/product.service";
 import { BadRequestError } from "../errors/BadRequestError";

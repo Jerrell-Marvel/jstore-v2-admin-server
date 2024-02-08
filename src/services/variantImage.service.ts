@@ -36,7 +36,7 @@ export const addMultipleVariantImages = async (data: { variantId: number; varian
 };
 
 // if perform check is true make sure to have client
-export const addVariantImages = async (images: Express.Multer.File[], variantId: number, options: { client?: PoolClient; performCheck?: boolean } = { performCheck: false }) => {
+export const createVariantImages = async (images: Express.Multer.File[], variantId: number, options: { client?: PoolClient; performCheck?: boolean } = { performCheck: false }) => {
   if (images.length === 0) {
     throw new Error("variant images can't be empty");
   }
