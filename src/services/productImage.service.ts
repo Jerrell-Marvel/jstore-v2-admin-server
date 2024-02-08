@@ -18,7 +18,7 @@ export const addProductImages = async (images: Express.Multer.File[], productId:
    DECLARE
        image_count INT;
    BEGIN 
-       PERFORM pg_try_advisory_xact_lock(12345);
+       PERFORM pg_try_advisory_xact_lock(1, %L);
 
        SELECT COUNT(*) INTO image_count FROM product_images WHERE product_id = %L;
    
@@ -30,12 +30,15 @@ export const addProductImages = async (images: Express.Multer.File[], productId:
    END
    $$`,
       productId,
+      productId,
       imageValues.length,
       imageValues
     );
   } else {
     query = format(`INSERT INTO product_images (image_url, product_id) VALUES %L;`, imageValues);
   }
+
+  console.log(query);
 
   let queryResult;
   if (options.client) {
