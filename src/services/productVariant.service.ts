@@ -42,3 +42,38 @@ export const hasVariants = async (productId: number, client?: PoolClient) => {
 
   return queryResult;
 };
+
+export const updateProduct = async (
+  product: {
+    name?: string;
+    quantity?: number;
+    price?: number;
+  },
+  variantId: number,
+  client?: PoolClient
+) => {
+  let placeHolderCount = 0;
+
+  const keys = Object.keys(product);
+  const values = Object.values(product);
+
+  const setClauses = keys.map((key, index) => `${key} = $${++placeHolderCount}`).join(", ");
+
+  const queryText = `UPDATE product_variants SET ${setClauses} WHERE product_variant_id = $${++placeHolderCount} RETURNING *;`;
+
+  const queryValues = [...values, variantId];
+
+  const query = {
+    text: queryText,
+    values: queryValues,
+  };
+
+  let queryResult: QueryResult;
+  if (client) {
+    queryResult = await client.query(query);
+  } else {
+    queryResult = await pool.query(query);
+  }
+
+  return queryResult;
+};

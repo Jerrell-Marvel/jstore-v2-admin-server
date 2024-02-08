@@ -54,4 +54,6 @@ export const createProductVariant = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProductVariant = async (req: Request, res: Response) => {};
+export const updateProductVariant = async (req: Request, res: Response) => {
+  const { body, params, variantImages } = await validateAndProcessCreateProductVariantReq(req);
+};
