@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.post("/:productId", memoryFileUpload().array("variantImages", 3), createProductVariant);
 
-router.patch("/:variantId", memoryFileUpload().array("variantImages", 3), updateProductVariant);
+router.patch("/:variantId", updateProductVariant);
+
+export default router;

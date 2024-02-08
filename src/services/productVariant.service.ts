@@ -43,7 +43,7 @@ export const hasVariants = async (productId: number, client?: PoolClient) => {
   return queryResult;
 };
 
-export const updateProduct = async (
+export const updateProductVariant = async (
   product: {
     name?: string;
     quantity?: number;

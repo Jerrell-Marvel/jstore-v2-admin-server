@@ -48,3 +48,15 @@ const fn = <T>(): B<T> => {
 result = fn();
 
 const fn2 = (a: { name: string; age: number } = { name: "asep", age: 5 }) => {};
+
+const fn3 = (test: [number, ...number[]]) => {
+  console.log(test);
+};
+
+fn3([1]);
+
+const a: number[] = [];
+
+if (a.length > 0) {
+  // fn3(a);
+}

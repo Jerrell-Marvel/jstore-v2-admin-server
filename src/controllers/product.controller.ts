@@ -5,7 +5,7 @@ import { addProductImages } from "../services/productImage.service";
 import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessUpdateProductReq } from "../requestHandlers/productReqHandlers";
 import { pool } from "../db";
 import { addProductVariants, hasVariants } from "../services/productVariant.service";
-import { addVariantImages } from "../services/variantImage.service";
+import { addMultipleVariantImages } from "../services/variantImage.service";
 import { saveFiles } from "../utils/fileUtils";
 import { BadRequestError } from "../errors/BadRequestError";
 
@@ -67,7 +67,7 @@ export const createProductWithVariants = async (req: Request, res: Response) => 
         variantImages: images,
       };
     });
-    await addVariantImages(variantIdWithImages, client);
+    await addMultipleVariantImages(variantIdWithImages, client);
 
     await saveFiles(imagesToSave);
 
