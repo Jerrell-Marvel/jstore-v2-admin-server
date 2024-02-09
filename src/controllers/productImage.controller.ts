@@ -6,21 +6,21 @@ import { saveFiles } from "../utils/fileUtils";
 import { BadRequestError } from "../errors/BadRequestError";
 import productImageService from "../services/productImage.service";
 
-const addProductImage = async (req: Request, res: Response) => {
-  const { productImage, params } = await validateAndProcessCreateProductImageReq(req);
+const addProductImages = async (req: Request, res: Response) => {
+  const { productImages, params } = await validateAndProcessCreateProductImageReq(req);
 
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
 
-    await productImageService.addProductImages([productImage], params.productId, { client, performCheck: true });
+    await productImageService.addProductImages(productImages, params.productId, { client, performCheck: true });
 
-    await saveFiles([productImage]);
+    await saveFiles(productImages);
 
     await client.query("COMMIT");
 
-    return res.json(productImage.path);
+    return res.json(productImages);
   } catch (error) {
     await client.query("ROLLBACK");
 
@@ -49,6 +49,6 @@ const deleteProductImage = async (req: Request, res: Response) => {
 };
 
 export default {
-  addProductImage,
+  addProductImages,
   deleteProductImage,
 };

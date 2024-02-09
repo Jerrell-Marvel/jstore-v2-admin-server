@@ -1,14 +1,10 @@
-import express, { NextFunction, Request, Response } from "express";
-import { fileUpload } from "../middleware/fileUpload";
-productController;
+import express from "express";
 import { productWithVariantsFileUpload } from "../middleware/productWithVariantsFileUpload";
 
 import { memoryFileUpload } from "../middleware/memoryFileUpload";
 import productController from "../controllers/product.controller";
 
 const router = express.Router();
-
-// router.post("/variants", fileUpload("./public/product-images").any(), createProductWithVariants);
 
 router.post("/variants", productWithVariantsFileUpload, productController.createProductWithVariants);
 
