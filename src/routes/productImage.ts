@@ -4,7 +4,16 @@ import productImageController from "../controllers/productImage.controller";
 productImageController;
 const router = express.Router();
 
-router.post("/:productId", memoryFileUpload().array("productImages", 8), productImageController.addProductImages);
+router.post(
+  "/:productId",
+  memoryFileUpload().fields([
+    {
+      name: "productImages",
+      maxCount: 8,
+    },
+  ]),
+  productImageController.addProductImages
+);
 
 router.delete("/:productImageId", productImageController.deleteProductImage);
 

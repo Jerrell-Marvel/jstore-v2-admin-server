@@ -4,6 +4,15 @@ import variantImageController from "../controllers/variantImage.controller";
 
 const router = express.Router();
 
-router.post("/:variantId", memoryFileUpload().array("variantImages", 3), variantImageController.addVariantImages);
+router.post(
+  "/:variantId",
+  memoryFileUpload().fields([
+    {
+      name: "variantImages",
+      maxCount: 3,
+    },
+  ]),
+  variantImageController.addVariantImages
+);
 
 export default router;

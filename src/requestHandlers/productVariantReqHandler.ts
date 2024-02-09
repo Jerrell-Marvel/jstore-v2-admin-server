@@ -6,7 +6,10 @@ import { Request } from "express";
 export const validateAndProcessCreateProductVariantReq = async (req: Request) => {
   const schema = z.object({
     body: ProductVariantSchema.strict(),
-    files: z.array(z.unknown()).nonempty().max(3).optional(),
+    files: z.object({
+      variantImages: z.array(z.unknown()).nonempty().max(3).optional(),
+    }),
+
     params: z.object({
       productId: z.coerce.number(),
     }),
@@ -14,7 +17,7 @@ export const validateAndProcessCreateProductVariantReq = async (req: Request) =>
 
   const parsedReq = await schema.parseAsync(req);
 
-  const variantImages = parsedReq.files as Express.Multer.File[] | undefined;
+  const variantImages = parsedReq.files.variantImages as Express.Multer.File[] | undefined;
 
   let variantImagesWithPath: Express.Multer.File[];
   if (variantImages) {

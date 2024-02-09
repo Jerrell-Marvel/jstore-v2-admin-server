@@ -4,7 +4,9 @@ import { attachPathToFiles } from "../utils/fileUtils";
 
 export const validateAndProcessCreateProductImageReq = async (req: Request) => {
   const schema = z.object({
-    files: z.array(z.unknown()).nonempty().max(8),
+    files: z.object({
+      productImages: z.array(z.unknown()).nonempty().max(8),
+    }),
     params: z.object({
       productId: z.coerce.number(),
     }),
@@ -12,7 +14,7 @@ export const validateAndProcessCreateProductImageReq = async (req: Request) => {
 
   const parsedReq = await schema.parseAsync(req);
 
-  const productImages = parsedReq.files as Express.Multer.File[];
+  const productImages = parsedReq.files.productImages as Express.Multer.File[];
 
   const productImagesWithPath = attachPathToFiles(productImages);
 

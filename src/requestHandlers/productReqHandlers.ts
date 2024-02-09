@@ -8,6 +8,7 @@ import { parse } from "dotenv";
 import { BadRequestError } from "../errors/BadRequestError";
 
 export const validateAndProcessCreateProductReq = async (req: Request) => {
+  console.log(req.files);
   const CreateProductReqSchema = z.object({
     body: ProductSchema,
     files: z

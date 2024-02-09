@@ -3,7 +3,16 @@ import { memoryFileUpload } from "../middleware/memoryFileUpload";
 import productVariantController from "../controllers/productVariant.controller";
 const router = express.Router();
 
-router.post("/:productId", memoryFileUpload().array("variantImages", 3), productVariantController.createProductVariant);
+router.post(
+  "/:productId",
+  memoryFileUpload().fields([
+    {
+      name: "variantImages",
+      maxCount: 3,
+    },
+  ]),
+  productVariantController.createProductVariant
+);
 
 router.patch("/:variantId", productVariantController.updateProductVariant);
 
