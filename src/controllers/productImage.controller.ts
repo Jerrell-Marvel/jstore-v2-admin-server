@@ -4,9 +4,9 @@ import { validateAndProcessCreateProductImageReq, validateAndProcessDeleteProduc
 import { pool } from "../db";
 import { saveFiles } from "../utils/fileUtils";
 import { BadRequestError } from "../errors/BadRequestError";
-import productImageService from "../services/productImage.service";
+import * as productImageService from "../services/productImage.service";
 
-const addProductImages = async (req: Request, res: Response) => {
+export const addProductImages = async (req: Request, res: Response) => {
   const { productImages, params } = await validateAndProcessCreateProductImageReq(req);
 
   const client = await pool.connect();
@@ -32,7 +32,7 @@ const addProductImages = async (req: Request, res: Response) => {
   }
 };
 
-const deleteProductImage = async (req: Request, res: Response) => {
+export const deleteProductImage = async (req: Request, res: Response) => {
   const {
     params: { productImageId },
   } = await validateAndProcessDeleteProductImageReq(req);
@@ -46,9 +46,4 @@ const deleteProductImage = async (req: Request, res: Response) => {
   }
 
   return res.json("succeed");
-};
-
-export default {
-  addProductImages,
-  deleteProductImage,
 };

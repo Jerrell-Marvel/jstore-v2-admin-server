@@ -3,7 +3,7 @@ import { pool } from "../db";
 import { InternalServerError } from "../errors/InternalServerError";
 import { Product, ProductVariant } from "../types/product";
 
-const addProduct = async (productData: Product & { displayImageUrl: string }, client?: PoolClient) => {
+export const addProduct = async (productData: Product & { displayImageUrl: string }, client?: PoolClient) => {
   const { name, description, quantity, price, displayImageUrl } = productData;
 
   const query = {
@@ -26,7 +26,7 @@ const addProduct = async (productData: Product & { displayImageUrl: string }, cl
   return result.rows[0].product_id as number;
 };
 
-const addProductWithVariants = async (productData: { name: string; description: string; displayPrice: number; displayImageUrl: string }, client?: PoolClient) => {
+export const addProductWithVariants = async (productData: { name: string; description: string; displayPrice: number; displayImageUrl: string }, client?: PoolClient) => {
   const { name, description, displayImageUrl, displayPrice } = productData;
 
   // const displayPrice = variants[defaultVariantIdx].price;
@@ -51,7 +51,7 @@ const addProductWithVariants = async (productData: { name: string; description: 
   return result.rows[0].product_id as number;
 };
 
-const updateProduct = async (
+export const updateProduct = async (
   product: {
     name?: string;
     description?: string;
@@ -90,7 +90,7 @@ const updateProduct = async (
   return queryResult;
 };
 
-const deleteProduct = async (productId: number) => {
+export const deleteProduct = async (productId: number) => {
   const queryText = `DELETE FROM products where product_id=$1;`;
 
   const query = {
@@ -101,13 +101,6 @@ const deleteProduct = async (productId: number) => {
   const queryResult = await pool.query(query);
 
   return queryResult;
-};
-
-export default {
-  addProduct,
-  addProductWithVariants,
-  updateProduct,
-  deleteProduct,
 };
 
 // export const updateProduct = async (

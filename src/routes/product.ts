@@ -2,7 +2,7 @@ import express from "express";
 import { productWithVariantsFileUpload } from "../middleware/productWithVariantsFileUpload";
 
 import { memoryFileUpload } from "../middleware/memoryFileUpload";
-import productController from "../controllers/product.controller";
+import * as productController from "../controllers/product.controller";
 import { validateAndProcessAddProductImageReq } from "../requestHandlers/variantImageReqHandler";
 
 const router = express.Router();

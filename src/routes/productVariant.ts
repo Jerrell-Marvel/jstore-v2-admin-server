@@ -1,6 +1,6 @@
 import express from "express";
 import { memoryFileUpload } from "../middleware/memoryFileUpload";
-import productVariantController from "../controllers/productVariant.controller";
+import * as productVariantController from "../controllers/productVariant.controller";
 const router = express.Router();
 
 router.post(

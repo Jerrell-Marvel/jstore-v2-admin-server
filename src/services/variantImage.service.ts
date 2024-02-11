@@ -3,7 +3,7 @@ import { pool } from "../db";
 import { PoolClient, QueryResult } from "pg";
 import { BadRequestError } from "../errors/BadRequestError";
 
-const createMultipleVariantImages = async (data: { variantId: number; variantImages: Express.Multer.File[] }[], client?: PoolClient) => {
+export const createMultipleVariantImages = async (data: { variantId: number; variantImages: Express.Multer.File[] }[], client?: PoolClient) => {
   // console.log(data);
   const imageValues: (string | number)[][] = [];
 
@@ -36,7 +36,7 @@ const createMultipleVariantImages = async (data: { variantId: number; variantIma
 };
 
 // if perform check is true make sure to have client
-const createVariantImages = async (images: Express.Multer.File[], variantId: number, options: { client?: PoolClient; performCheck?: boolean } = { performCheck: false }) => {
+export const createVariantImages = async (images: Express.Multer.File[], variantId: number, options: { client?: PoolClient; performCheck?: boolean } = { performCheck: false }) => {
   if (images.length === 0) {
     throw new Error("variant images can't be empty");
   }
@@ -86,9 +86,4 @@ const createVariantImages = async (images: Express.Multer.File[], variantId: num
 
   // const result = rows.map((row) => row.product_image_id);
   // return result;
-};
-
-export default {
-  createMultipleVariantImages,
-  createVariantImages,
 };

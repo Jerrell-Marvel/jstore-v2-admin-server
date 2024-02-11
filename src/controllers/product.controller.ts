@@ -7,12 +7,12 @@ import { pool } from "../db";
 
 import { saveFiles } from "../utils/fileUtils";
 import { BadRequestError } from "../errors/BadRequestError";
-import productService from "../services/product.service";
-import productImageService from "../services/productImage.service";
-import productVariantService from "../services/productVariant.service";
-import variantImageService from "../services/variantImage.service";
+import * as productService from "../services/product.service";
+import * as productImageService from "../services/productImage.service";
+import * as productVariantService from "../services/productVariant.service";
+import * as variantImageService from "../services/variantImage.service";
 
-const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response) => {
   const { body, files, displayImage, productImages } = await validateAndProcessCreateProductReq(req);
 
   const client = await pool.connect();
@@ -41,7 +41,7 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 
-const createProductWithVariants = async (req: Request, res: Response) => {
+export const createProductWithVariants = async (req: Request, res: Response) => {
   // return res.json(req.files);
   const { body, files, variantsImages, displayImage, displayPrice, productImages } = await validateAndProcessCreateProductWithVariantsReq(req);
 
@@ -89,7 +89,7 @@ const createProductWithVariants = async (req: Request, res: Response) => {
   }
 };
 
-const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: Request, res: Response) => {
   const { body, displayImage, params } = await validateAndProcessUpdateProductReq(req);
 
   const client = await pool.connect();
@@ -132,7 +132,7 @@ const updateProduct = async (req: Request, res: Response) => {
     client.release();
   }
 };
-const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: Request, res: Response) => {
   const { params } = await validateAndProcessDeleteProductReq(req);
 
   const deleteProductResult = await productService.deleteProduct(params.productId);
@@ -144,9 +144,9 @@ const deleteProduct = async (req: Request, res: Response) => {
   return res.json("deleted");
 };
 
-export default {
-  createProduct,
-  createProductWithVariants,
-  updateProduct,
-  deleteProduct,
-};
+// export default {
+//   createProduct,
+//   createProductWithVariants,
+//   updateProduct,
+//   deleteProduct,
+// };

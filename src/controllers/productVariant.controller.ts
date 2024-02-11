@@ -6,11 +6,11 @@ import { saveFiles } from "../utils/fileUtils";
 
 import { BadRequestError } from "../errors/BadRequestError";
 
-import productService from "../services/product.service";
-import productVariantService from "../services/productVariant.service";
-import variantImageService from "../services/variantImage.service";
+import * as productService from "../services/product.service";
+import * as productVariantService from "../services/productVariant.service";
+import * as variantImageService from "../services/variantImage.service";
 
-const createProductVariant = async (req: Request, res: Response) => {
+export const createProductVariant = async (req: Request, res: Response) => {
   const { body, variantImages, params } = await validateAndProcessCreateProductVariantReq(req);
 
   const client = await pool.connect();
@@ -57,7 +57,7 @@ const createProductVariant = async (req: Request, res: Response) => {
   }
 };
 
-const updateProductVariant = async (req: Request, res: Response) => {
+export const updateProductVariant = async (req: Request, res: Response) => {
   const { body, params } = await validateAndProcessUpdateProductVariantReq(req);
   console.log("here");
 
@@ -70,7 +70,7 @@ const updateProductVariant = async (req: Request, res: Response) => {
   return res.json(updateProductVariantResult);
 };
 
-const deleteProductVariant = async (req: Request, res: Response) => {
+export const deleteProductVariant = async (req: Request, res: Response) => {
   const { params } = await validateAndProcessDeleteProductVariantReq(req);
 
   const deleteProductVariantResult = await productVariantService.deleteVariant(params.variantId);
@@ -80,10 +80,4 @@ const deleteProductVariant = async (req: Request, res: Response) => {
   }
 
   return res.json("variant deleted");
-};
-
-export default {
-  createProductVariant,
-  updateProductVariant,
-  deleteProductVariant,
 };

@@ -3,9 +3,9 @@ import { validateAndProcessAddProductImageReq } from "../requestHandlers/variant
 import { pool } from "../db";
 import { BadRequestError } from "../errors/BadRequestError";
 import { saveFiles } from "../utils/fileUtils";
-import variantImageService from "../services/variantImage.service";
+import * as variantImageService from "../services/variantImage.service";
 
-const addVariantImages = async (req: Request, res: Response) => {
+export const addVariantImages = async (req: Request, res: Response) => {
   const { params, variantImages } = await validateAndProcessAddProductImageReq(req);
 
   const client = await pool.connect();
@@ -32,5 +32,3 @@ const addVariantImages = async (req: Request, res: Response) => {
     client.release();
   }
 };
-
-export default { addVariantImages };

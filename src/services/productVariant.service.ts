@@ -3,7 +3,7 @@ import { ProductVariant } from "../types/product";
 import format from "pg-format";
 import { pool } from "../db";
 
-const addProductVariants = async (variants: ProductVariant[], productId: number, client?: PoolClient) => {
+export const addProductVariants = async (variants: ProductVariant[], productId: number, client?: PoolClient) => {
   const variantValues = variants.map((variant) => [productId, variant.name, variant.price, variant.quantity]);
 
   const query = format(
@@ -26,7 +26,7 @@ const addProductVariants = async (variants: ProductVariant[], productId: number,
   return result;
 };
 
-const hasVariants = async (productId: number, client?: PoolClient) => {
+export const hasVariants = async (productId: number, client?: PoolClient) => {
   const query = {
     text: `SELECT has_variants FROM products WHERE product_id=$1 FOR UPDATE;`,
     values: [productId],
@@ -43,7 +43,7 @@ const hasVariants = async (productId: number, client?: PoolClient) => {
   return queryResult;
 };
 
-const updateProductVariant = async (
+export const updateProductVariant = async (
   product: {
     name?: string;
     quantity?: number;
@@ -78,7 +78,7 @@ const updateProductVariant = async (
   return queryResult;
 };
 
-const deleteVariant = async (variantId: number) => {
+export const deleteVariant = async (variantId: number) => {
   const queryText = `DELETE FROM product_variants WHERE product_id=$1;`;
 
   const query = {
@@ -89,11 +89,4 @@ const deleteVariant = async (variantId: number) => {
   const queryResult = await pool.query(query);
 
   return queryResult;
-};
-
-export default {
-  addProductVariants,
-  hasVariants,
-  updateProductVariant,
-  deleteVariant,
 };

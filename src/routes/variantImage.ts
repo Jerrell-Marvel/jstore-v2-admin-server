@@ -1,6 +1,6 @@
 import express from "express";
 import { memoryFileUpload } from "../middleware/memoryFileUpload";
-import variantImageController from "../controllers/variantImage.controller";
+import * as variantImageController from "../controllers/variantImage.controller";
 
 const router = express.Router();
 

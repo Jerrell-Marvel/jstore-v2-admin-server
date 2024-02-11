@@ -3,7 +3,7 @@ import { pool } from "../db";
 import { PoolClient, QueryResult } from "pg";
 
 // if perform check is true make sure to have client
-const addProductImages = async (images: Express.Multer.File[], productId: number, options: { client?: PoolClient; performCheck?: boolean } = { performCheck: false }) => {
+export const addProductImages = async (images: Express.Multer.File[], productId: number, options: { client?: PoolClient; performCheck?: boolean } = { performCheck: false }) => {
   if (images.length === 0) {
     return [];
   }
@@ -53,7 +53,7 @@ const addProductImages = async (images: Express.Multer.File[], productId: number
   // return result;
 };
 
-const deleteProductImage = async (productImageId: number, client?: PoolClient) => {
+export const deleteProductImage = async (productImageId: number, client?: PoolClient) => {
   const queryText = `UPDATE product_images SET is_active=FALSE WHERE product_image_id=$1;`;
 
   const query = {
@@ -69,9 +69,4 @@ const deleteProductImage = async (productImageId: number, client?: PoolClient) =
   }
 
   return queryResult;
-};
-
-export default {
-  addProductImages,
-  deleteProductImage,
 };
