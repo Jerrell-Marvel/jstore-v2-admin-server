@@ -42,3 +42,16 @@ export const validateAndProcessUpdateProductVariantReq = async (req: Request) =>
 
   return { body: parsedReq.body, params: parsedReq.params };
 };
+
+export const validateAndProcessDeleteProductVariantReq = async (req: Request) => {
+  console.log(req.body);
+  const schema = z.object({
+    params: z.object({
+      variantId: z.coerce.number(),
+    }),
+  });
+
+  const parsedReq = await schema.parseAsync(req);
+
+  return { params: parsedReq.params };
+};

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validateAndProcessCreateProductVariantReq, validateAndProcessUpdateProductVariantReq } from "../requestHandlers/productVariantReqHandler";
+import { validateAndProcessCreateProductVariantReq, validateAndProcessDeleteProductVariantReq, validateAndProcessUpdateProductVariantReq } from "../requestHandlers/productVariantReqHandler";
 import { pool } from "../db";
 
 import { saveFiles } from "../utils/fileUtils";
@@ -70,7 +70,20 @@ const updateProductVariant = async (req: Request, res: Response) => {
   return res.json(updateProductVariantResult);
 };
 
+const deleteProductVariant = async (req: Request, res: Response) => {
+  const { params } = await validateAndProcessDeleteProductVariantReq(req);
+
+  const deleteProductVariantResult = await productVariantService.deleteVariant(params.variantId);
+
+  if (deleteProductVariantResult.rowCount === 0) {
+    throw new BadRequestError("variant doesn't exist");
+  }
+
+  return res.json("variant deleted");
+};
+
 export default {
   createProductVariant,
   updateProductVariant,
+  deleteProductVariant,
 };

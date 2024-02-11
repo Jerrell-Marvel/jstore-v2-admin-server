@@ -16,4 +16,6 @@ router.post(
 
 router.patch("/:variantId", productVariantController.updateProductVariant);
 
+router.delete("/:variantId", productVariantController.deleteProductVariant);
+
 export default router;

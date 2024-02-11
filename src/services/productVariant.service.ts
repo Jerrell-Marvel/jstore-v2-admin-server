@@ -78,8 +78,22 @@ const updateProductVariant = async (
   return queryResult;
 };
 
+const deleteVariant = async (variantId: number) => {
+  const queryText = `DELETE FROM product_variants WHERE product_id=$1;`;
+
+  const query = {
+    text: queryText,
+    values: [variantId],
+  };
+
+  const queryResult = await pool.query(query);
+
+  return queryResult;
+};
+
 export default {
   addProductVariants,
   hasVariants,
   updateProductVariant,
+  deleteVariant,
 };
