@@ -54,7 +54,7 @@ const addProductImages = async (images: Express.Multer.File[], productId: number
 };
 
 const deleteProductImage = async (productImageId: number, client?: PoolClient) => {
-  const queryText = `DELETE FROM product_images WHERE product_image_id=$1;`;
+  const queryText = `UPDATE product_images SET is_active=FALSE WHERE product_image_id=$1;`;
 
   const query = {
     text: queryText,
