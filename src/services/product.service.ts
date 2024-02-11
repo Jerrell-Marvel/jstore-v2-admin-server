@@ -90,10 +90,24 @@ const updateProduct = async (
   return queryResult;
 };
 
+const deleteProduct = async (productId: number) => {
+  const queryText = `DELETE FROM products where product_id=$1;`;
+
+  const query = {
+    text: queryText,
+    values: [productId],
+  };
+
+  const queryResult = await pool.query(query);
+
+  return queryResult;
+};
+
 export default {
   addProduct,
   addProductWithVariants,
   updateProduct,
+  deleteProduct,
 };
 
 // export const updateProduct = async (

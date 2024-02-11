@@ -92,7 +92,7 @@ export const validateAndProcessCreateProductWithVariantsReq = async (req: Reques
 };
 
 export const validateAndProcessUpdateProductReq = async (req: Request) => {
-  const updateProductSchema = z
+  const updateProductReqSchema = z
     .object({
       body: ProductSchema.partial().strict(),
 
@@ -107,7 +107,7 @@ export const validateAndProcessUpdateProductReq = async (req: Request) => {
       message: "cannot send empty data",
     });
 
-  const parsedReq = await updateProductSchema.parseAsync(req);
+  const parsedReq = await updateProductReqSchema.parseAsync(req);
 
   const displayImage = parsedReq.file as Express.Multer.File | undefined;
 
@@ -117,4 +117,16 @@ export const validateAndProcessUpdateProductReq = async (req: Request) => {
   }
 
   return { body: parsedReq.body, params: parsedReq.params, file: parsedReq.file, displayImage: displayImageWithPath };
+};
+
+export const validateAndProcessDeleteProductReq = async (req: Request) => {
+  const deleteProductReqSchema = z.object({
+    params: z.object({
+      productId: z.coerce.number(),
+    }),
+  });
+
+  const parsedReq = await deleteProductReqSchema.parseAsync(req);
+
+  return { params: parsedReq.params };
 };

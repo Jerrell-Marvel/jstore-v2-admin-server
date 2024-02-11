@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessUpdateProductReq } from "../requestHandlers/productReqHandlers";
+import { validateAndProcessCreateProductReq, validateAndProcessCreateProductWithVariantsReq, validateAndProcessDeleteProductReq, validateAndProcessUpdateProductReq } from "../requestHandlers/productReqHandlers";
 import { pool } from "../db";
 
 import { saveFiles } from "../utils/fileUtils";
@@ -132,9 +132,21 @@ const updateProduct = async (req: Request, res: Response) => {
     client.release();
   }
 };
+const deleteProduct = async (req: Request, res: Response) => {
+  const { params } = await validateAndProcessDeleteProductReq(req);
+
+  const deleteProductResult = await productService.deleteProduct(params.productId);
+
+  if (deleteProductResult.rowCount === 0) {
+    throw new BadRequestError("product doesn't exist");
+  }
+
+  return res.json("deleted");
+};
 
 export default {
   createProduct,
   createProductWithVariants,
   updateProduct,
+  deleteProduct,
 };

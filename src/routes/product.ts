@@ -3,6 +3,7 @@ import { productWithVariantsFileUpload } from "../middleware/productWithVariants
 
 import { memoryFileUpload } from "../middleware/memoryFileUpload";
 import productController from "../controllers/product.controller";
+import { validateAndProcessAddProductImageReq } from "../requestHandlers/variantImageReqHandler";
 
 const router = express.Router();
 
@@ -25,5 +26,7 @@ router.post(
 );
 
 router.patch("/:productId", memoryFileUpload().single("displayImage"), productController.updateProduct);
+
+router.delete("/:productId", productController.deleteProduct);
 
 export default router;
