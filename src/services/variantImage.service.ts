@@ -87,3 +87,16 @@ export const createVariantImages = async (images: Express.Multer.File[], variant
   // const result = rows.map((row) => row.product_image_id);
   // return result;
 };
+
+export const deleteVariantImage = async (variantImageId: number) => {
+  const queryText = `UPDATE variant_images SET is_active=FALSE WHERE variant_image_id:$1;`;
+
+  const query = {
+    text: queryText,
+    values: [variantImageId],
+  };
+
+  const queryResult = await pool.query(query);
+
+  return queryResult;
+};

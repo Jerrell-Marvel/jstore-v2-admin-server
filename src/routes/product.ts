@@ -3,7 +3,6 @@ import { productWithVariantsFileUpload } from "../middleware/productWithVariants
 
 import { memoryFileUpload } from "../middleware/memoryFileUpload";
 import * as productController from "../controllers/product.controller";
-import { validateAndProcessAddProductImageReq } from "../requestHandlers/variantImageReqHandler";
 
 const router = express.Router();
 

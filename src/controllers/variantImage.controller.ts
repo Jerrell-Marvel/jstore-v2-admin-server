@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { validateAndProcessAddProductImageReq } from "../requestHandlers/variantImageReqHandler";
+import { validateAndProcessAddVariantImageReq, validateAndProcessDeleteVariantImageReq } from "../requestHandlers/variantImageReqHandler";
 import { pool } from "../db";
 import { BadRequestError } from "../errors/BadRequestError";
 import { saveFiles } from "../utils/fileUtils";
 import * as variantImageService from "../services/variantImage.service";
 
 export const addVariantImages = async (req: Request, res: Response) => {
-  const { params, variantImages } = await validateAndProcessAddProductImageReq(req);
+  const { params, variantImages } = await validateAndProcessAddVariantImageReq(req);
 
   const client = await pool.connect();
 
@@ -31,4 +31,16 @@ export const addVariantImages = async (req: Request, res: Response) => {
   } finally {
     client.release();
   }
+};
+
+export const deleteVariantImage = async (req: Request, res: Response) => {
+  const { params } = await validateAndProcessDeleteVariantImageReq(req);
+
+  const deleteVariantImageResult = await variantImageService.deleteVariantImage(params.variantImageId);
+
+  if (deleteVariantImageResult.rowCount === 0) {
+    throw new BadRequestError("variant image doesn't exist");
+  }
+
+  return res.json("variant images deleted");
 };

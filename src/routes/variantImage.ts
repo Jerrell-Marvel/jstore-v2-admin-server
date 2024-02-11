@@ -15,4 +15,6 @@ router.post(
   variantImageController.addVariantImages
 );
 
+router.delete("/:variantImageId", variantImageController.deleteVariantImage);
+
 export default router;
