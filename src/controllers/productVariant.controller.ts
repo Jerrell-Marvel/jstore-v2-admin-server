@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validateAndProcessCreateProductVariantReq, validateAndProcessDeleteProductVariantReq, validateAndProcessUpdateProductVariantReq } from "../requestHandlers/productVariantReqHandler";
+import { validateAndProcessCreateProductVariantReq, validateAndProcessDeleteAllProductVariantReq, validateAndProcessDeleteProductVariantReq, validateAndProcessUpdateProductVariantReq } from "../requestHandlers/productVariantReqHandler";
 import { pool } from "../db";
 
 import { saveFiles } from "../utils/fileUtils";
@@ -9,6 +9,7 @@ import { BadRequestError } from "../errors/BadRequestError";
 import * as productService from "../services/product.service";
 import * as productVariantService from "../services/productVariant.service";
 import * as variantImageService from "../services/variantImage.service";
+import { updateProduct } from "./product.controller";
 
 export const createProductVariant = async (req: Request, res: Response) => {
   const { body, variantImages, params } = await validateAndProcessCreateProductVariantReq(req);
@@ -80,4 +81,32 @@ export const deleteProductVariant = async (req: Request, res: Response) => {
   }
 
   return res.json("variant deleted");
+};
+
+export const deleteAllProductVariant = async (req: Request, res: Response) => {
+  const { body, params } = await validateAndProcessDeleteAllProductVariantReq(req);
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const productServiceResult = await productService.updateProduct({ default_variant: undefined, quantity: body.quantity, price: body.quantity }, params.productId, client);
+
+    if (productServiceResult.rowCount === 0) {
+      throw new BadRequestError("product doesn't exist");
+    }
+
+    await productVariantService.deleteVariantsByProductId(params.productId, client);
+
+    await client.query("COMMIT");
+
+    return res.json("success");
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    return res.json(error);
+  } finally {
+    client.release();
+  }
 };

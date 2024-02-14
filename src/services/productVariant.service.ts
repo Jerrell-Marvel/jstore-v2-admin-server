@@ -79,11 +79,24 @@ export const updateProductVariant = async (
 };
 
 export const deleteVariant = async (variantId: number) => {
-  const queryText = `DELETE FROM product_variants WHERE product_id=$1;`;
+  const queryText = `DELETE FROM product_variants WHERE variant_id=$1;`;
 
   const query = {
     text: queryText,
     values: [variantId],
+  };
+
+  const queryResult = await pool.query(query);
+
+  return queryResult;
+};
+
+export const deleteVariantsByProductId = async (productId: number, client: PoolClient) => {
+  const queryText = `DELETE FROM product_variants WHERE product_id=$1;`;
+
+  const query = {
+    text: queryText,
+    values: [productId],
   };
 
   const queryResult = await pool.query(query);

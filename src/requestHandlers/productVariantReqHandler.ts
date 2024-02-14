@@ -46,6 +46,10 @@ export const validateAndProcessUpdateProductVariantReq = async (req: Request) =>
 export const validateAndProcessDeleteProductVariantReq = async (req: Request) => {
   console.log(req.body);
   const schema = z.object({
+    body: z.object({
+      quantity: z.coerce.number().optional(),
+      price: z.coerce.number().optional(),
+    }),
     params: z.object({
       variantId: z.coerce.number(),
     }),
@@ -53,5 +57,25 @@ export const validateAndProcessDeleteProductVariantReq = async (req: Request) =>
 
   const parsedReq = await schema.parseAsync(req);
 
-  return { params: parsedReq.params };
+  return { body: parsedReq.body, params: parsedReq.params };
+};
+
+export const validateAndProcessDeleteAllProductVariantReq = async (req: Request) => {
+  console.log(req.body);
+
+  const schema = z.object({
+    body: z
+      .object({
+        quantity: z.coerce.number().gt(0),
+        price: z.coerce.number().gt(0),
+      })
+      .strict(),
+    params: z.object({
+      productId: z.coerce.number(),
+    }),
+  });
+
+  const parsedReq = await schema.parseAsync(req);
+
+  return { body: parsedReq.body, params: parsedReq.params };
 };
