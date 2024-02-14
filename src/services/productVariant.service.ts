@@ -79,7 +79,7 @@ export const updateProductVariant = async (
 };
 
 export const deleteVariant = async (variantId: number) => {
-  const queryText = `DELETE FROM product_variants WHERE variant_id=$1;`;
+  const queryText = `DELETE FROM product_variants WHERE product_variant_id=$1;`;
 
   const query = {
     text: queryText,
