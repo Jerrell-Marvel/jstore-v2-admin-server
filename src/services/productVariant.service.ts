@@ -99,7 +99,7 @@ export const deleteVariantsByProductId = async (productId: number, client: PoolC
     values: [productId],
   };
 
-  const queryResult = await pool.query(query);
+  const queryResult = await client.query(query);
 
   return queryResult;
 };

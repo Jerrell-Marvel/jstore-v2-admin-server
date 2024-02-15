@@ -91,7 +91,7 @@ export const deleteAllProductVariant = async (req: Request, res: Response) => {
   try {
     await client.query("BEGIN");
 
-    const productServiceResult = await productService.updateProduct({ default_variant: undefined, quantity: body.quantity, price: body.quantity }, params.productId, client);
+    const productServiceResult = await productService.updateProduct({ default_variant: undefined, quantity: body.quantity, price: body.quantity, has_variants: false }, params.productId, client);
 
     if (productServiceResult.rowCount === 0) {
       throw new BadRequestError("product doesn't exist");
@@ -103,6 +103,7 @@ export const deleteAllProductVariant = async (req: Request, res: Response) => {
 
     return res.json("success");
   } catch (error) {
+    console.log(error);
     await client.query("ROLLBACK");
 
     return res.json(error);

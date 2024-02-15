@@ -80,6 +80,8 @@ export const updateProduct = async (
     values: queryValues,
   };
 
+  console.log(query);
+
   let queryResult: QueryResult;
   if (client) {
     queryResult = await client.query(query);
